@@ -1,0 +1,7 @@
+node_modules
+.dev.vars
+.DS_Store
+*.log
+# downloaded pin images and gallery-dl sidecars never enter git; they live in R2
+out/
+.cookies.txt

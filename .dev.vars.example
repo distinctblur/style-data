@@ -1,0 +1,5 @@
+# Local secrets. Copy to .dev.vars (gitignored). Leave a key empty to run that step in deterministic MOCK mode.
+# Pinterest session cookie (_pinterest_sess). Safari: Develop > Show Web Inspector > Storage > Cookies > pinterest.com.
+PINTEREST_SESS=
+GEMINI_API_KEY=
+ANTHROPIC_API_KEY=

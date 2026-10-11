@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "owner": "meghan",
+  "boards": [
+    { "slug": "my-style",     "url": "https://www.pinterest.com/megsk8/my-style/",     "domain": "fashion", "note": "everyday style, 686 pins on 2026-10-11" },
+    { "slug": "swim-look",    "url": "https://www.pinterest.com/megsk8/swim-look/",    "domain": "fashion", "note": "swimwear" },
+    { "slug": "for-the-home", "url": "https://www.pinterest.com/megsk8/for-the-home/", "domain": "home",    "note": "interiors and furniture, 300+ pins" }
+  ]
+}
