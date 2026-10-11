@@ -32,4 +32,9 @@ node pipeline/seed-profile.mjs             → data/profiles/fashion.profile-dra
 
 ## Runs
 
-_pending_
+| Date | Step | Result |
+|---|---|---|
+| 2026-10-11 | extract (3 boards) | 963 pins (my-style 619, swim-look 8, for-the-home 336); 9 sha256 dupes, 6 video, 0 missing images. Public boards fetched **unauthenticated**; the cookie route was never needed. Pinterest's own pin counts (686/9/364) include deleted pins. Details: `docs/extraction-notes-2026-10-11.md`. |
+| 2026-10-11 | normalise v2 | 963 rows; rich-pin data on 434 (products 37, priced 51); `purchase_url` null throughout, `link` is the product pointer. |
+| 2026-10-11 | upload-images | see `data/images.jsonl` (954 objects, 111 MB). |
+| 2026-10-11 | tag / aggregate / seed-profile | keyless mock run verified end to end (944 taggable: 614 fashion, 330 home). Live run pending spend approval. |
