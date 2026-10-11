@@ -7,6 +7,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { aggregate, parseJsonl, nearestHue, NEUTRALS, summaryLines } from "../aggregate.mjs";
+import { combinations } from "../aggregate-fashion.mjs";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPT = path.join(DIR, "..", "aggregate.mjs");
@@ -163,6 +164,27 @@ test("absences list items that appear at most once, phrased as observations", ()
   for (const a of abs) assert.match(a, /^(never pins|pins only once): /);
 });
 
+test("garment_combos_top: emergent pairs/triples of subcategories among outfit pins, weighted and capped", () => {
+  const p = run();
+  const { pairs, triples } = p.overall.garment_combos_top;
+  assert.ok(pairs.length > 0 && pairs.length <= 15);
+  assert.ok(triples.length <= 15);
+  for (const row of pairs) {
+    assert.equal(row.combo.split("+").length, 2);
+    assert.deepEqual(row.combo.split("+"), [...row.combo.split("+")].sort(), "combo keys are sorted");
+    assert.ok(row.weight > 0 && row.count >= 1);
+  }
+  for (const row of triples) assert.equal(row.combo.split("+").length, 3);
+  // The fixture's repeated blazer + wide-leg trouser + loafer looks must surface as a triple.
+  assert.ok(triples.some((r) => r.combo === "blazer+loafer+wide-leg-trouser"), JSON.stringify(triples.slice(0, 3)));
+  // Sorted by weight desc; weights are shares of outfit-pin weight, so a pair
+  // present in every outfit pin would be 1 and none can exceed 1.
+  for (let i = 1; i < pairs.length; i++) assert.ok(pairs[i - 1].weight >= pairs[i].weight);
+  for (const row of pairs) assert.ok(row.weight <= 1);
+  assert.deepEqual(combinations(["a", "b", "c"], 2), [["a", "b"], ["a", "c"], ["b", "c"]]);
+  assert.deepEqual(combinations(["a"], 2), []);
+});
+
 test("top-N lists are capped and extra fields present", () => {
   const p = run();
   assert.ok(p.overall.subcategory_top.length <= 15);
@@ -199,8 +221,8 @@ test("min-confidence threshold is respected", () => {
   assert.ok(loose.overall.palette.accent.some((c) => c.colour === "red") || loose.overall.palette.secondary.some((c) => c.colour === "red"));
 });
 
-test("summary is 15 lines", () => {
-  assert.equal(summaryLines(run()).length, 15);
+test("summary is 16 lines", () => {
+  assert.equal(summaryLines(run()).length, 16);
 });
 
 test("CLI writes the profile and prints a summary to stderr", () => {

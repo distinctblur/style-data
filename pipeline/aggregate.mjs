@@ -129,9 +129,13 @@ export class Counter {
     for (const v of this.map.values()) t += v.weight;
     return t;
   }
-  /** Normalised to the counter's own total, sorted desc by weight then key. */
-  rows(keyName = "key", limit = Infinity) {
-    const total = this.total() || 1;
+  /**
+   * Normalised to the counter's own total (or to `denominator` when given, e.g.
+   * total pin weight so a row reads as "share of pins"), sorted desc by weight
+   * then key.
+   */
+  rows(keyName = "key", limit = Infinity, denominator = null) {
+    const total = denominator ?? (this.total() || 1);
     return [...this.map.entries()]
       .map(([k, v]) => ({ [keyName]: k, weight: r4(v.weight / total), count: v.count }))
       .sort((a, b) => b.weight - a.weight || a[keyName].localeCompare(b[keyName]))

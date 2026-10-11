@@ -1,0 +1,1701 @@
+{
+  "version": "aggregate-v2",
+  "domain": "home",
+  "coverage": {
+    "pins_total": 336,
+    "tagged": 330,
+    "below_confidence": 0,
+    "not_interior": 81,
+    "unjoined": 0,
+    "used": 249,
+    "interior_share": 0.7545,
+    "date_min": "2011-12-19",
+    "date_max": "2026-04-29",
+    "undated": 0,
+    "half_life_days": 730,
+    "min_confidence": 0.5,
+    "boards": [
+      "for-the-home"
+    ]
+  },
+  "overall": {
+    "pins_used": 249,
+    "weight_total": 8.1932,
+    "rooms": [
+      {
+        "room": "other",
+        "weight": 0.2214,
+        "count": 24
+      },
+      {
+        "room": "kitchen",
+        "weight": 0.2032,
+        "count": 39
+      },
+      {
+        "room": "living",
+        "weight": 0.1762,
+        "count": 29
+      },
+      {
+        "room": "bedroom",
+        "weight": 0.1168,
+        "count": 26
+      },
+      {
+        "room": "hallway",
+        "weight": 0.0756,
+        "count": 14
+      },
+      {
+        "room": "bathroom",
+        "weight": 0.0646,
+        "count": 33
+      },
+      {
+        "room": "outdoor-patio",
+        "weight": 0.0536,
+        "count": 30
+      },
+      {
+        "room": "entry",
+        "weight": 0.0371,
+        "count": 24
+      },
+      {
+        "room": "kids-bedroom",
+        "weight": 0.0141,
+        "count": 6
+      },
+      {
+        "room": "garden",
+        "weight": 0.0105,
+        "count": 7
+      },
+      {
+        "room": "office",
+        "weight": 0.009,
+        "count": 7
+      },
+      {
+        "room": "laundry",
+        "weight": 0.0087,
+        "count": 4
+      },
+      {
+        "room": "dining",
+        "weight": 0.0081,
+        "count": 5
+      },
+      {
+        "room": "nursery",
+        "weight": 0.0012,
+        "count": 1
+      }
+    ],
+    "item_types_top": [
+      {
+        "type": "flooring",
+        "weight": 0.1007,
+        "count": 118
+      },
+      {
+        "type": "shelving",
+        "weight": 0.0957,
+        "count": 68
+      },
+      {
+        "type": "plant",
+        "weight": 0.0907,
+        "count": 55
+      },
+      {
+        "type": "vase",
+        "weight": 0.0788,
+        "count": 27
+      },
+      {
+        "type": "window",
+        "weight": 0.0647,
+        "count": 44
+      },
+      {
+        "type": "paint",
+        "weight": 0.0524,
+        "count": 58
+      },
+      {
+        "type": "cabinet",
+        "weight": 0.0465,
+        "count": 57
+      },
+      {
+        "type": "art",
+        "weight": 0.0445,
+        "count": 55
+      },
+      {
+        "type": "bench",
+        "weight": 0.0331,
+        "count": 18
+      },
+      {
+        "type": "faucet",
+        "weight": 0.0311,
+        "count": 23
+      },
+      {
+        "type": "rug",
+        "weight": 0.0266,
+        "count": 42
+      },
+      {
+        "type": "cushion",
+        "weight": 0.0256,
+        "count": 41
+      },
+      {
+        "type": "curtain",
+        "weight": 0.0254,
+        "count": 29
+      },
+      {
+        "type": "sofa",
+        "weight": 0.0248,
+        "count": 23
+      },
+      {
+        "type": "other",
+        "weight": 0.0227,
+        "count": 43
+      },
+      {
+        "type": "door",
+        "weight": 0.02,
+        "count": 41
+      },
+      {
+        "type": "bedding",
+        "weight": 0.018,
+        "count": 23
+      },
+      {
+        "type": "countertop",
+        "weight": 0.0172,
+        "count": 41
+      },
+      {
+        "type": "bed",
+        "weight": 0.0149,
+        "count": 21
+      },
+      {
+        "type": "throw",
+        "weight": 0.0149,
+        "count": 10
+      }
+    ],
+    "materials": [
+      {
+        "material": "unknown",
+        "weight": 0.1687,
+        "count": 175
+      },
+      {
+        "material": "dark-wood",
+        "weight": 0.1369,
+        "count": 154
+      },
+      {
+        "material": "light-wood",
+        "weight": 0.1104,
+        "count": 82
+      },
+      {
+        "material": "painted-wood",
+        "weight": 0.1065,
+        "count": 240
+      },
+      {
+        "material": "ceramic",
+        "weight": 0.0913,
+        "count": 94
+      },
+      {
+        "material": "glass",
+        "weight": 0.0734,
+        "count": 66
+      },
+      {
+        "material": "cotton",
+        "weight": 0.0577,
+        "count": 97
+      },
+      {
+        "material": "linen",
+        "weight": 0.0546,
+        "count": 41
+      },
+      {
+        "material": "chrome",
+        "weight": 0.0426,
+        "count": 49
+      },
+      {
+        "material": "oak",
+        "weight": 0.0382,
+        "count": 18
+      },
+      {
+        "material": "black-metal",
+        "weight": 0.0341,
+        "count": 44
+      },
+      {
+        "material": "wool",
+        "weight": 0.0218,
+        "count": 34
+      },
+      {
+        "material": "stone",
+        "weight": 0.021,
+        "count": 63
+      },
+      {
+        "material": "concrete",
+        "weight": 0.0111,
+        "count": 12
+      },
+      {
+        "material": "jute",
+        "weight": 0.0092,
+        "count": 10
+      },
+      {
+        "material": "rattan",
+        "weight": 0.0059,
+        "count": 13
+      },
+      {
+        "material": "terrazzo",
+        "weight": 0.0043,
+        "count": 4
+      },
+      {
+        "material": "leather",
+        "weight": 0.0032,
+        "count": 8
+      },
+      {
+        "material": "brass",
+        "weight": 0.0031,
+        "count": 10
+      },
+      {
+        "material": "walnut",
+        "weight": 0.0031,
+        "count": 5
+      },
+      {
+        "material": "marble",
+        "weight": 0.0014,
+        "count": 5
+      },
+      {
+        "material": "cane",
+        "weight": 0.0005,
+        "count": 1
+      },
+      {
+        "material": "velvet",
+        "weight": 0.0005,
+        "count": 3
+      },
+      {
+        "material": "boucle",
+        "weight": 0.0003,
+        "count": 1
+      }
+    ],
+    "styles": [
+      {
+        "style": "transitional",
+        "weight": 0.1936,
+        "count": 530
+      },
+      {
+        "style": "traditional",
+        "weight": 0.1816,
+        "count": 454
+      },
+      {
+        "style": "boho",
+        "weight": 0.1524,
+        "count": 100
+      },
+      {
+        "style": "contemporary",
+        "weight": 0.1059,
+        "count": 154
+      },
+      {
+        "style": "other",
+        "weight": 0.1025,
+        "count": 106
+      },
+      {
+        "style": "modern-farmhouse",
+        "weight": 0.075,
+        "count": 168
+      },
+      {
+        "style": "eclectic",
+        "weight": 0.0679,
+        "count": 94
+      },
+      {
+        "style": "minimalist",
+        "weight": 0.0295,
+        "count": 31
+      },
+      {
+        "style": "japandi",
+        "weight": 0.0265,
+        "count": 18
+      },
+      {
+        "style": "scandinavian",
+        "weight": 0.024,
+        "count": 33
+      },
+      {
+        "style": "coastal",
+        "weight": 0.0173,
+        "count": 49
+      },
+      {
+        "style": "mid-century",
+        "weight": 0.012,
+        "count": 27
+      },
+      {
+        "style": "industrial",
+        "weight": 0.0094,
+        "count": 24
+      },
+      {
+        "style": "french-country",
+        "weight": 0.0023,
+        "count": 8
+      },
+      {
+        "style": "art-deco",
+        "weight": 0.0001,
+        "count": 1
+      }
+    ],
+    "palette": {
+      "neutrals": [
+        {
+          "colour": "brown",
+          "weight": 0.2195,
+          "count": 206
+        },
+        {
+          "colour": "white",
+          "weight": 0.204,
+          "count": 315
+        },
+        {
+          "colour": "beige",
+          "weight": 0.1392,
+          "count": 159
+        },
+        {
+          "colour": "grey",
+          "weight": 0.0711,
+          "count": 103
+        },
+        {
+          "colour": "black",
+          "weight": 0.0581,
+          "count": 115
+        },
+        {
+          "colour": "cream",
+          "weight": 0.0341,
+          "count": 50
+        },
+        {
+          "colour": "warm-white",
+          "weight": 0.0279,
+          "count": 16
+        },
+        {
+          "colour": "sand",
+          "weight": 0.0258,
+          "count": 15
+        },
+        {
+          "colour": "greige",
+          "weight": 0.0071,
+          "count": 14
+        },
+        {
+          "colour": "taupe",
+          "weight": 0.0047,
+          "count": 11
+        },
+        {
+          "colour": "charcoal",
+          "weight": 0.0044,
+          "count": 14
+        }
+      ],
+      "secondary": [
+        {
+          "colour": "forest",
+          "weight": 0.0526,
+          "count": 22
+        },
+        {
+          "colour": "multi",
+          "weight": 0.0434,
+          "count": 58
+        }
+      ],
+      "accent": [
+        {
+          "colour": "terracotta",
+          "weight": 0.033,
+          "count": 13
+        },
+        {
+          "colour": "sage",
+          "weight": 0.0303,
+          "count": 32
+        },
+        {
+          "colour": "olive",
+          "weight": 0.0218,
+          "count": 18
+        }
+      ],
+      "neutral_share": 0.7959,
+      "secondary_share": 0.096,
+      "accent_share": 0.0851
+    },
+    "palette_mood": [
+      {
+        "mood": "warm-neutral",
+        "weight": 0.4766,
+        "count": 118
+      },
+      {
+        "mood": "earthy",
+        "weight": 0.2601,
+        "count": 41
+      },
+      {
+        "mood": "bright-airy",
+        "weight": 0.1999,
+        "count": 59
+      },
+      {
+        "mood": "cool-neutral",
+        "weight": 0.0309,
+        "count": 16
+      },
+      {
+        "mood": "colourful",
+        "weight": 0.0264,
+        "count": 11
+      },
+      {
+        "mood": "monochrome",
+        "weight": 0.0034,
+        "count": 2
+      },
+      {
+        "mood": "dark-moody",
+        "weight": 0.0027,
+        "count": 2
+      }
+    ],
+    "era": [
+      {
+        "era": "contemporary",
+        "weight": 0.8098,
+        "count": 201
+      },
+      {
+        "era": "mixed",
+        "weight": 0.1884,
+        "count": 46
+      },
+      {
+        "era": "unknown",
+        "weight": 0.001,
+        "count": 1
+      },
+      {
+        "era": "vintage",
+        "weight": 0.0008,
+        "count": 1
+      }
+    ],
+    "vibe_keywords_top": [
+      {
+        "keyword": "warm",
+        "weight": 0.0696,
+        "count": 66
+      },
+      {
+        "keyword": "botanical",
+        "weight": 0.0659,
+        "count": 17
+      },
+      {
+        "keyword": "earthy",
+        "weight": 0.0509,
+        "count": 17
+      },
+      {
+        "keyword": "cozy",
+        "weight": 0.0493,
+        "count": 45
+      },
+      {
+        "keyword": "practical",
+        "weight": 0.0477,
+        "count": 46
+      },
+      {
+        "keyword": "lush",
+        "weight": 0.0427,
+        "count": 9
+      },
+      {
+        "keyword": "bright",
+        "weight": 0.0372,
+        "count": 64
+      },
+      {
+        "keyword": "simple",
+        "weight": 0.0352,
+        "count": 7
+      },
+      {
+        "keyword": "inviting",
+        "weight": 0.0308,
+        "count": 43
+      },
+      {
+        "keyword": "functional",
+        "weight": 0.0294,
+        "count": 72
+      },
+      {
+        "keyword": "greenery",
+        "weight": 0.0265,
+        "count": 4
+      },
+      {
+        "keyword": "cosy",
+        "weight": 0.0245,
+        "count": 38
+      },
+      {
+        "keyword": "layered",
+        "weight": 0.0239,
+        "count": 24
+      },
+      {
+        "keyword": "organized",
+        "weight": 0.0232,
+        "count": 52
+      },
+      {
+        "keyword": "casual",
+        "weight": 0.0231,
+        "count": 19
+      },
+      {
+        "keyword": "natural",
+        "weight": 0.0198,
+        "count": 9
+      },
+      {
+        "keyword": "rustic",
+        "weight": 0.0189,
+        "count": 31
+      },
+      {
+        "keyword": "classic",
+        "weight": 0.0186,
+        "count": 40
+      },
+      {
+        "keyword": "diy",
+        "weight": 0.0181,
+        "count": 38
+      },
+      {
+        "keyword": "airy",
+        "weight": 0.0165,
+        "count": 16
+      }
+    ],
+    "item_colour_by_type": [
+      {
+        "type": "flooring",
+        "weight": 0.1007,
+        "colours": [
+          {
+            "colour": "brown",
+            "weight": 0.5214,
+            "count": 57
+          },
+          {
+            "colour": "beige",
+            "weight": 0.1551,
+            "count": 27
+          },
+          {
+            "colour": "sand",
+            "weight": 0.1511,
+            "count": 4
+          }
+        ]
+      },
+      {
+        "type": "shelving",
+        "weight": 0.0957,
+        "colours": [
+          {
+            "colour": "brown",
+            "weight": 0.4403,
+            "count": 11
+          },
+          {
+            "colour": "beige",
+            "weight": 0.1819,
+            "count": 14
+          },
+          {
+            "colour": "black",
+            "weight": 0.1744,
+            "count": 7
+          }
+        ]
+      },
+      {
+        "type": "plant",
+        "weight": 0.0907,
+        "colours": [
+          {
+            "colour": "forest",
+            "weight": 0.5703,
+            "count": 21
+          },
+          {
+            "colour": "olive",
+            "weight": 0.2112,
+            "count": 11
+          },
+          {
+            "colour": "sage",
+            "weight": 0.165,
+            "count": 12
+          }
+        ]
+      },
+      {
+        "type": "vase",
+        "weight": 0.0788,
+        "colours": [
+          {
+            "colour": "white",
+            "weight": 0.5185,
+            "count": 11
+          },
+          {
+            "colour": "terracotta",
+            "weight": 0.3629,
+            "count": 2
+          },
+          {
+            "colour": "multi",
+            "weight": 0.0292,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "weight": 0.0647,
+        "colours": [
+          {
+            "colour": "brown",
+            "weight": 0.4516,
+            "count": 4
+          },
+          {
+            "colour": "white",
+            "weight": 0.4503,
+            "count": 35
+          },
+          {
+            "colour": "warm-white",
+            "weight": 0.0673,
+            "count": 3
+          }
+        ]
+      },
+      {
+        "type": "paint",
+        "weight": 0.0524,
+        "colours": [
+          {
+            "colour": "beige",
+            "weight": 0.4388,
+            "count": 15
+          },
+          {
+            "colour": "warm-white",
+            "weight": 0.2376,
+            "count": 3
+          },
+          {
+            "colour": "greige",
+            "weight": 0.081,
+            "count": 8
+          }
+        ]
+      },
+      {
+        "type": "cabinet",
+        "weight": 0.0465,
+        "colours": [
+          {
+            "colour": "beige",
+            "weight": 0.5089,
+            "count": 4
+          },
+          {
+            "colour": "white",
+            "weight": 0.2229,
+            "count": 26
+          },
+          {
+            "colour": "brown",
+            "weight": 0.1152,
+            "count": 12
+          }
+        ]
+      },
+      {
+        "type": "art",
+        "weight": 0.0445,
+        "colours": [
+          {
+            "colour": "multi",
+            "weight": 0.2731,
+            "count": 12
+          },
+          {
+            "colour": "sage",
+            "weight": 0.2035,
+            "count": 1
+          },
+          {
+            "colour": "white",
+            "weight": 0.129,
+            "count": 7
+          }
+        ]
+      },
+      {
+        "type": "bench",
+        "weight": 0.0331,
+        "colours": [
+          {
+            "colour": "brown",
+            "weight": 0.9096,
+            "count": 5
+          },
+          {
+            "colour": "white",
+            "weight": 0.0574,
+            "count": 8
+          },
+          {
+            "colour": "cream",
+            "weight": 0.0215,
+            "count": 2
+          }
+        ]
+      },
+      {
+        "type": "faucet",
+        "weight": 0.0311,
+        "colours": [
+          {
+            "colour": "grey",
+            "weight": 0.94,
+            "count": 19
+          },
+          {
+            "colour": "black",
+            "weight": 0.06,
+            "count": 4
+          }
+        ]
+      }
+    ],
+    "absences": [
+      "pins only once: art deco"
+    ]
+  },
+  "boards": {
+    "for-the-home": {
+      "pins_used": 249,
+      "weight_total": 8.1932,
+      "rooms": [
+        {
+          "room": "other",
+          "weight": 0.2214,
+          "count": 24
+        },
+        {
+          "room": "kitchen",
+          "weight": 0.2032,
+          "count": 39
+        },
+        {
+          "room": "living",
+          "weight": 0.1762,
+          "count": 29
+        },
+        {
+          "room": "bedroom",
+          "weight": 0.1168,
+          "count": 26
+        },
+        {
+          "room": "hallway",
+          "weight": 0.0756,
+          "count": 14
+        },
+        {
+          "room": "bathroom",
+          "weight": 0.0646,
+          "count": 33
+        },
+        {
+          "room": "outdoor-patio",
+          "weight": 0.0536,
+          "count": 30
+        },
+        {
+          "room": "entry",
+          "weight": 0.0371,
+          "count": 24
+        },
+        {
+          "room": "kids-bedroom",
+          "weight": 0.0141,
+          "count": 6
+        },
+        {
+          "room": "garden",
+          "weight": 0.0105,
+          "count": 7
+        },
+        {
+          "room": "office",
+          "weight": 0.009,
+          "count": 7
+        },
+        {
+          "room": "laundry",
+          "weight": 0.0087,
+          "count": 4
+        },
+        {
+          "room": "dining",
+          "weight": 0.0081,
+          "count": 5
+        },
+        {
+          "room": "nursery",
+          "weight": 0.0012,
+          "count": 1
+        }
+      ],
+      "item_types_top": [
+        {
+          "type": "flooring",
+          "weight": 0.1007,
+          "count": 118
+        },
+        {
+          "type": "shelving",
+          "weight": 0.0957,
+          "count": 68
+        },
+        {
+          "type": "plant",
+          "weight": 0.0907,
+          "count": 55
+        },
+        {
+          "type": "vase",
+          "weight": 0.0788,
+          "count": 27
+        },
+        {
+          "type": "window",
+          "weight": 0.0647,
+          "count": 44
+        },
+        {
+          "type": "paint",
+          "weight": 0.0524,
+          "count": 58
+        },
+        {
+          "type": "cabinet",
+          "weight": 0.0465,
+          "count": 57
+        },
+        {
+          "type": "art",
+          "weight": 0.0445,
+          "count": 55
+        },
+        {
+          "type": "bench",
+          "weight": 0.0331,
+          "count": 18
+        },
+        {
+          "type": "faucet",
+          "weight": 0.0311,
+          "count": 23
+        },
+        {
+          "type": "rug",
+          "weight": 0.0266,
+          "count": 42
+        },
+        {
+          "type": "cushion",
+          "weight": 0.0256,
+          "count": 41
+        },
+        {
+          "type": "curtain",
+          "weight": 0.0254,
+          "count": 29
+        },
+        {
+          "type": "sofa",
+          "weight": 0.0248,
+          "count": 23
+        },
+        {
+          "type": "other",
+          "weight": 0.0227,
+          "count": 43
+        },
+        {
+          "type": "door",
+          "weight": 0.02,
+          "count": 41
+        },
+        {
+          "type": "bedding",
+          "weight": 0.018,
+          "count": 23
+        },
+        {
+          "type": "countertop",
+          "weight": 0.0172,
+          "count": 41
+        },
+        {
+          "type": "bed",
+          "weight": 0.0149,
+          "count": 21
+        },
+        {
+          "type": "throw",
+          "weight": 0.0149,
+          "count": 10
+        }
+      ],
+      "materials": [
+        {
+          "material": "unknown",
+          "weight": 0.1687,
+          "count": 175
+        },
+        {
+          "material": "dark-wood",
+          "weight": 0.1369,
+          "count": 154
+        },
+        {
+          "material": "light-wood",
+          "weight": 0.1104,
+          "count": 82
+        },
+        {
+          "material": "painted-wood",
+          "weight": 0.1065,
+          "count": 240
+        },
+        {
+          "material": "ceramic",
+          "weight": 0.0913,
+          "count": 94
+        },
+        {
+          "material": "glass",
+          "weight": 0.0734,
+          "count": 66
+        },
+        {
+          "material": "cotton",
+          "weight": 0.0577,
+          "count": 97
+        },
+        {
+          "material": "linen",
+          "weight": 0.0546,
+          "count": 41
+        },
+        {
+          "material": "chrome",
+          "weight": 0.0426,
+          "count": 49
+        },
+        {
+          "material": "oak",
+          "weight": 0.0382,
+          "count": 18
+        },
+        {
+          "material": "black-metal",
+          "weight": 0.0341,
+          "count": 44
+        },
+        {
+          "material": "wool",
+          "weight": 0.0218,
+          "count": 34
+        },
+        {
+          "material": "stone",
+          "weight": 0.021,
+          "count": 63
+        },
+        {
+          "material": "concrete",
+          "weight": 0.0111,
+          "count": 12
+        },
+        {
+          "material": "jute",
+          "weight": 0.0092,
+          "count": 10
+        },
+        {
+          "material": "rattan",
+          "weight": 0.0059,
+          "count": 13
+        },
+        {
+          "material": "terrazzo",
+          "weight": 0.0043,
+          "count": 4
+        },
+        {
+          "material": "leather",
+          "weight": 0.0032,
+          "count": 8
+        },
+        {
+          "material": "brass",
+          "weight": 0.0031,
+          "count": 10
+        },
+        {
+          "material": "walnut",
+          "weight": 0.0031,
+          "count": 5
+        },
+        {
+          "material": "marble",
+          "weight": 0.0014,
+          "count": 5
+        },
+        {
+          "material": "cane",
+          "weight": 0.0005,
+          "count": 1
+        },
+        {
+          "material": "velvet",
+          "weight": 0.0005,
+          "count": 3
+        },
+        {
+          "material": "boucle",
+          "weight": 0.0003,
+          "count": 1
+        }
+      ],
+      "styles": [
+        {
+          "style": "transitional",
+          "weight": 0.1936,
+          "count": 530
+        },
+        {
+          "style": "traditional",
+          "weight": 0.1816,
+          "count": 454
+        },
+        {
+          "style": "boho",
+          "weight": 0.1524,
+          "count": 100
+        },
+        {
+          "style": "contemporary",
+          "weight": 0.1059,
+          "count": 154
+        },
+        {
+          "style": "other",
+          "weight": 0.1025,
+          "count": 106
+        },
+        {
+          "style": "modern-farmhouse",
+          "weight": 0.075,
+          "count": 168
+        },
+        {
+          "style": "eclectic",
+          "weight": 0.0679,
+          "count": 94
+        },
+        {
+          "style": "minimalist",
+          "weight": 0.0295,
+          "count": 31
+        },
+        {
+          "style": "japandi",
+          "weight": 0.0265,
+          "count": 18
+        },
+        {
+          "style": "scandinavian",
+          "weight": 0.024,
+          "count": 33
+        },
+        {
+          "style": "coastal",
+          "weight": 0.0173,
+          "count": 49
+        },
+        {
+          "style": "mid-century",
+          "weight": 0.012,
+          "count": 27
+        },
+        {
+          "style": "industrial",
+          "weight": 0.0094,
+          "count": 24
+        },
+        {
+          "style": "french-country",
+          "weight": 0.0023,
+          "count": 8
+        },
+        {
+          "style": "art-deco",
+          "weight": 0.0001,
+          "count": 1
+        }
+      ],
+      "palette": {
+        "neutrals": [
+          {
+            "colour": "brown",
+            "weight": 0.2195,
+            "count": 206
+          },
+          {
+            "colour": "white",
+            "weight": 0.204,
+            "count": 315
+          },
+          {
+            "colour": "beige",
+            "weight": 0.1392,
+            "count": 159
+          },
+          {
+            "colour": "grey",
+            "weight": 0.0711,
+            "count": 103
+          },
+          {
+            "colour": "black",
+            "weight": 0.0581,
+            "count": 115
+          },
+          {
+            "colour": "cream",
+            "weight": 0.0341,
+            "count": 50
+          },
+          {
+            "colour": "warm-white",
+            "weight": 0.0279,
+            "count": 16
+          },
+          {
+            "colour": "sand",
+            "weight": 0.0258,
+            "count": 15
+          },
+          {
+            "colour": "greige",
+            "weight": 0.0071,
+            "count": 14
+          },
+          {
+            "colour": "taupe",
+            "weight": 0.0047,
+            "count": 11
+          },
+          {
+            "colour": "charcoal",
+            "weight": 0.0044,
+            "count": 14
+          }
+        ],
+        "secondary": [
+          {
+            "colour": "forest",
+            "weight": 0.0526,
+            "count": 22
+          },
+          {
+            "colour": "multi",
+            "weight": 0.0434,
+            "count": 58
+          }
+        ],
+        "accent": [
+          {
+            "colour": "terracotta",
+            "weight": 0.033,
+            "count": 13
+          },
+          {
+            "colour": "sage",
+            "weight": 0.0303,
+            "count": 32
+          },
+          {
+            "colour": "olive",
+            "weight": 0.0218,
+            "count": 18
+          }
+        ],
+        "neutral_share": 0.7959,
+        "secondary_share": 0.096,
+        "accent_share": 0.0851
+      },
+      "palette_mood": [
+        {
+          "mood": "warm-neutral",
+          "weight": 0.4766,
+          "count": 118
+        },
+        {
+          "mood": "earthy",
+          "weight": 0.2601,
+          "count": 41
+        },
+        {
+          "mood": "bright-airy",
+          "weight": 0.1999,
+          "count": 59
+        },
+        {
+          "mood": "cool-neutral",
+          "weight": 0.0309,
+          "count": 16
+        },
+        {
+          "mood": "colourful",
+          "weight": 0.0264,
+          "count": 11
+        },
+        {
+          "mood": "monochrome",
+          "weight": 0.0034,
+          "count": 2
+        },
+        {
+          "mood": "dark-moody",
+          "weight": 0.0027,
+          "count": 2
+        }
+      ],
+      "era": [
+        {
+          "era": "contemporary",
+          "weight": 0.8098,
+          "count": 201
+        },
+        {
+          "era": "mixed",
+          "weight": 0.1884,
+          "count": 46
+        },
+        {
+          "era": "unknown",
+          "weight": 0.001,
+          "count": 1
+        },
+        {
+          "era": "vintage",
+          "weight": 0.0008,
+          "count": 1
+        }
+      ],
+      "vibe_keywords_top": [
+        {
+          "keyword": "warm",
+          "weight": 0.0696,
+          "count": 66
+        },
+        {
+          "keyword": "botanical",
+          "weight": 0.0659,
+          "count": 17
+        },
+        {
+          "keyword": "earthy",
+          "weight": 0.0509,
+          "count": 17
+        },
+        {
+          "keyword": "cozy",
+          "weight": 0.0493,
+          "count": 45
+        },
+        {
+          "keyword": "practical",
+          "weight": 0.0477,
+          "count": 46
+        },
+        {
+          "keyword": "lush",
+          "weight": 0.0427,
+          "count": 9
+        },
+        {
+          "keyword": "bright",
+          "weight": 0.0372,
+          "count": 64
+        },
+        {
+          "keyword": "simple",
+          "weight": 0.0352,
+          "count": 7
+        },
+        {
+          "keyword": "inviting",
+          "weight": 0.0308,
+          "count": 43
+        },
+        {
+          "keyword": "functional",
+          "weight": 0.0294,
+          "count": 72
+        },
+        {
+          "keyword": "greenery",
+          "weight": 0.0265,
+          "count": 4
+        },
+        {
+          "keyword": "cosy",
+          "weight": 0.0245,
+          "count": 38
+        },
+        {
+          "keyword": "layered",
+          "weight": 0.0239,
+          "count": 24
+        },
+        {
+          "keyword": "organized",
+          "weight": 0.0232,
+          "count": 52
+        },
+        {
+          "keyword": "casual",
+          "weight": 0.0231,
+          "count": 19
+        },
+        {
+          "keyword": "natural",
+          "weight": 0.0198,
+          "count": 9
+        },
+        {
+          "keyword": "rustic",
+          "weight": 0.0189,
+          "count": 31
+        },
+        {
+          "keyword": "classic",
+          "weight": 0.0186,
+          "count": 40
+        },
+        {
+          "keyword": "diy",
+          "weight": 0.0181,
+          "count": 38
+        },
+        {
+          "keyword": "airy",
+          "weight": 0.0165,
+          "count": 16
+        }
+      ],
+      "item_colour_by_type": [
+        {
+          "type": "flooring",
+          "weight": 0.1007,
+          "colours": [
+            {
+              "colour": "brown",
+              "weight": 0.5214,
+              "count": 57
+            },
+            {
+              "colour": "beige",
+              "weight": 0.1551,
+              "count": 27
+            },
+            {
+              "colour": "sand",
+              "weight": 0.1511,
+              "count": 4
+            }
+          ]
+        },
+        {
+          "type": "shelving",
+          "weight": 0.0957,
+          "colours": [
+            {
+              "colour": "brown",
+              "weight": 0.4403,
+              "count": 11
+            },
+            {
+              "colour": "beige",
+              "weight": 0.1819,
+              "count": 14
+            },
+            {
+              "colour": "black",
+              "weight": 0.1744,
+              "count": 7
+            }
+          ]
+        },
+        {
+          "type": "plant",
+          "weight": 0.0907,
+          "colours": [
+            {
+              "colour": "forest",
+              "weight": 0.5703,
+              "count": 21
+            },
+            {
+              "colour": "olive",
+              "weight": 0.2112,
+              "count": 11
+            },
+            {
+              "colour": "sage",
+              "weight": 0.165,
+              "count": 12
+            }
+          ]
+        },
+        {
+          "type": "vase",
+          "weight": 0.0788,
+          "colours": [
+            {
+              "colour": "white",
+              "weight": 0.5185,
+              "count": 11
+            },
+            {
+              "colour": "terracotta",
+              "weight": 0.3629,
+              "count": 2
+            },
+            {
+              "colour": "multi",
+              "weight": 0.0292,
+              "count": 1
+            }
+          ]
+        },
+        {
+          "type": "window",
+          "weight": 0.0647,
+          "colours": [
+            {
+              "colour": "brown",
+              "weight": 0.4516,
+              "count": 4
+            },
+            {
+              "colour": "white",
+              "weight": 0.4503,
+              "count": 35
+            },
+            {
+              "colour": "warm-white",
+              "weight": 0.0673,
+              "count": 3
+            }
+          ]
+        },
+        {
+          "type": "paint",
+          "weight": 0.0524,
+          "colours": [
+            {
+              "colour": "beige",
+              "weight": 0.4388,
+              "count": 15
+            },
+            {
+              "colour": "warm-white",
+              "weight": 0.2376,
+              "count": 3
+            },
+            {
+              "colour": "greige",
+              "weight": 0.081,
+              "count": 8
+            }
+          ]
+        },
+        {
+          "type": "cabinet",
+          "weight": 0.0465,
+          "colours": [
+            {
+              "colour": "beige",
+              "weight": 0.5089,
+              "count": 4
+            },
+            {
+              "colour": "white",
+              "weight": 0.2229,
+              "count": 26
+            },
+            {
+              "colour": "brown",
+              "weight": 0.1152,
+              "count": 12
+            }
+          ]
+        },
+        {
+          "type": "art",
+          "weight": 0.0445,
+          "colours": [
+            {
+              "colour": "multi",
+              "weight": 0.2731,
+              "count": 12
+            },
+            {
+              "colour": "sage",
+              "weight": 0.2035,
+              "count": 1
+            },
+            {
+              "colour": "white",
+              "weight": 0.129,
+              "count": 7
+            }
+          ]
+        },
+        {
+          "type": "bench",
+          "weight": 0.0331,
+          "colours": [
+            {
+              "colour": "brown",
+              "weight": 0.9096,
+              "count": 5
+            },
+            {
+              "colour": "white",
+              "weight": 0.0574,
+              "count": 8
+            },
+            {
+              "colour": "cream",
+              "weight": 0.0215,
+              "count": 2
+            }
+          ]
+        },
+        {
+          "type": "faucet",
+          "weight": 0.0311,
+          "colours": [
+            {
+              "colour": "grey",
+              "weight": 0.94,
+              "count": 19
+            },
+            {
+              "colour": "black",
+              "weight": 0.06,
+              "count": 4
+            }
+          ]
+        }
+      ],
+      "absences": [
+        "pins only once: art deco"
+      ]
+    }
+  }
+}

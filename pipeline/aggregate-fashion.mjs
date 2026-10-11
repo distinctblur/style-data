@@ -67,10 +67,10 @@ export function nearestHue(hex) {
 // string). These are prompts for the intake interview, not conclusions.
 export const ABSENCE_CANDIDATES = {
   formulas: [
-    { label: "blazer + trouser", match: ["blazer trouser", "blazer pant", "suit"] },
+    { label: "blazer + trouser", match: ["blazer trouser", "blazer wide-leg-trouser", "blazer tailored-trouser", "blazer pant", "suit"] },
     { label: "dress-based looks", match: ["dress"] },
     { label: "skirt + top", match: ["skirt"] },
-    { label: "knit + jean", match: ["knit jean", "sweater jean", "knit denim"] },
+    { label: "knit + jean", match: ["knit jean", "knit jeans", "knit-sweater jeans", "sweater jean", "knit denim"] },
     { label: "jumpsuit", match: ["jumpsuit"] },
     { label: "athleisure / sporty", match: ["athleisure", "sport", "active"] },
     { label: "tonal / monochrome dressing", match: ["tonal", "monochrome", "mono"] },
@@ -143,10 +143,16 @@ function summarise(rows) {
   const vibes = new Counter();
   const dominant = new Counter();
   const dominantHex = new Map();
+  // Emergent formulas: which garment sets actually co-occur in her outfit pins,
+  // independent of the named formula list (which the first live run showed
+  // covers only a third of her looks). Keyed by sorted subcategory set.
+  const combos2 = new Counter();
+  const combos3 = new Counter();
 
   let fWeightSum = 0;
   let fWeighted = 0;
   let totalWeight = 0;
+  let outfitWeight = 0;
 
   // Raw (unweighted) appearance counts for `absences`.
   const seen = { formulas: [], garments: [], colours: [] };
@@ -179,6 +185,15 @@ function summarise(rows) {
       seen.colours.push(String(g.colour ?? ""));
     }
     seen.formulas.push(String(t.formula ?? ""));
+    if (t.is_outfit !== false) {
+      outfitWeight += w;
+      const parts = [...new Set(garments.map((g) => g.subcategory || g.category).filter(Boolean))].sort();
+      // Absence candidates for formulas are also checked against what is worn
+      // together, since the model files most of her looks under `other`.
+      seen.formulas.push(parts.join(" "));
+      for (const c of combinations(parts, 2)) combos2.add(c.join("+"), w);
+      for (const c of combinations(parts, 3)) combos3.add(c.join("+"), w);
+    }
     const hue = nearestHue(r.dominant);
     if (hue) {
       dominant.add(hue, w);
@@ -206,6 +221,12 @@ function summarise(rows) {
     dominant_colors: dominant.rows("hue", 8).map((d) => ({ hue: d.hue, hex: dominantHex.get(d.hue), weight: d.weight, count: d.count })),
     garment_mix: categories.rows("category"),
     subcategory_top: subcategories.rows("subcategory", 15),
+    // Share of outfit-pin weight containing the set (not share of all combos),
+    // so "jeans+knit-sweater 0.31" reads as "31% of her outfit pins".
+    garment_combos_top: {
+      pairs: combos2.rows("combo", 15, outfitWeight || 1),
+      triples: combos3.rows("combo", 15, outfitWeight || 1),
+    },
     vibe_keywords_top: vibes.rows("keyword", 20),
     absences: scanAbsences([
       [ABSENCE_CANDIDATES.formulas, seen.formulas],
@@ -226,6 +247,7 @@ export function summaryLines(profile) {
     `dates ${c.date_min ?? "?"} → ${c.date_max ?? "?"}, half-life ${c.half_life_days}d, min confidence ${c.min_confidence}`,
     `boards: ${c.boards.map((b) => `${b} (${profile.boards[b].pins_used})`).join(", ") || "—"}`,
     `formulas: ${top(o.formula_weights, "formula")}`,
+    `combos: ${top(o.garment_combos_top.triples, "combo")}`,
     `silhouettes: ${top(o.silhouettes, "silhouette")}`,
     `formality mean ${o.formality_mean ?? "—"}; histogram ${["1", "2", "3", "4", "5"].map((l) => `${l}:${(o.formality_histogram[l].weight * 100).toFixed(0)}%`).join(" ")}`,
     `seasons: ${top(o.seasons, "season")}`,
@@ -237,4 +259,22 @@ export function summaryLines(profile) {
     `vibes: ${top(o.vibe_keywords_top, "keyword", 5)}`,
     `absences (${o.absences.length}): ${o.absences.slice(0, 4).join("; ")}${o.absences.length > 4 ? "; …" : ""}`,
   ];
+}
+
+/** All k-element combinations of a (sorted) array, in lexicographic order. */
+export function combinations(items, k) {
+  const out = [];
+  const pick = (start, acc) => {
+    if (acc.length === k) {
+      out.push(acc.slice());
+      return;
+    }
+    for (let i = start; i < items.length; i++) {
+      acc.push(items[i]);
+      pick(i + 1, acc);
+      acc.pop();
+    }
+  };
+  if (k <= items.length) pick(0, []);
+  return out;
 }
