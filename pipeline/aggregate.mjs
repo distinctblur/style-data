@@ -4,7 +4,7 @@
 //   node pipeline/aggregate.mjs [--domain fashion|home] \
 //     [--tags data/tags.jsonl] [--pins data/pins.jsonl] \
 //     [--out data/profiles/<domain>.taste-profile.json] \
-//     [--half-life-days 730] [--min-confidence 0.5] [--boards boards.json]
+//     [--half-life-days 1095] [--min-confidence 0.5] [--boards boards.json]
 //
 // Without --domain, every domain present in tags.jsonl is aggregated and one
 // file is written per domain; `<domain>` in --out is replaced by the domain
@@ -19,9 +19,14 @@
 // gets a recency weight
 //   w = 0.5 ^ (age_days / half_life_days)
 // where age is measured from the newest dated pin of the domain; pins with no
-// date get the median weight of the dated pins. Everything is reported per
-// board and overall. Output is deterministic: fixed key order, arrays sorted by
-// weight desc then key asc, numbers rounded to 4 dp. No network, no deps.
+// date get the median weight of the dated pins. The default half-life is
+// DEFAULT_HALF_LIFE_DAYS = 1095 (three years; owner decision 2026-10-12,
+// docs/formula-v2-proposal.md §8: recency stays so the pre-2016 cold-weather
+// pins fade, but a 730-day half-life made the profile a single-summer one).
+// Every weighted row also carries its raw `count`, so a consumer can cite both.
+// Everything is reported per board and overall. Output is deterministic: fixed
+// key order, arrays sorted by weight desc then key asc, numbers rounded to 4 dp.
+// No network, no deps.
 //
 // Domain summarisers live in aggregate-fashion.mjs and aggregate-home.mjs;
 // this file holds the shared machinery and the CLI. Tag strings are opaque
@@ -33,6 +38,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { aggregateFashion, summaryLines as fashionSummaryLines } from "./aggregate-fashion.mjs";
+import { getDomain } from "./taxonomies/index.mjs";
 import { aggregateHome, summaryLinesHome } from "./aggregate-home.mjs";
 
 // Fashion symbols re-exported for consumers that predate the split.
@@ -52,6 +58,7 @@ const DIR = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.join(DIR, "..");
 
 export const VERSION = "aggregate-v2";
+export const DEFAULT_HALF_LIFE_DAYS = 1095;
 export const DEFAULT_TAGS = "data/tags.jsonl";
 export const DEFAULT_PINS = "data/pins.jsonl";
 export const DEFAULT_OUT = "data/profiles/<domain>.taste-profile.json";
@@ -235,25 +242,52 @@ export function domainsIn(tags, pins = [], boardDomains = defaultBoardDomains())
  * @param {string} opts.domain
  * @param {object[]} opts.tags   parsed tags.jsonl rows
  * @param {object[]} opts.pins   parsed pins.jsonl rows
- * @param {number} [opts.halfLifeDays=730]
+ * @param {number} [opts.halfLifeDays=1095]
  * @param {number} [opts.minConfidence=0.5]
  * @param {Map<string,string>} [opts.boardDomains]
  * @param {(tag:object)=>boolean} opts.usable        false drops the pin (non-outfit, non-interior)
  * @param {string} opts.excludedKey                   coverage key for pins `usable` dropped
  * @param {string} opts.shareKey                      coverage key for used / (tagged - below_confidence)
  * @param {(rows:object[])=>object} opts.summarise    per-scope summary
+ * @param {(rows:object[])=>object} [opts.extraCoverage]  domain-specific counts over the used pins, spliced into coverage after shareKey
  */
+/**
+ * One tag row per pin. tags.jsonl is append-only and may hold several rows for
+ * a pin (a retry after a failure, or a re-tag under a newer prompt version).
+ * Prefer the last successful row whose `prompt_version` is `preferVersion`;
+ * otherwise the last successful row of any version. Rows with `tag: null` are
+ * kept only when the pin has no successful row at all (so coverage still
+ * counts them as attempted).
+ */
+export function selectTagRows(tags, { preferVersion = null } = {}) {
+  const byPin = new Map();
+  for (const row of tags) {
+    if (!row || row.pin_id == null) continue;
+    const key = `${row.pin_id}\u0000${row.domain ?? ""}`;
+    const cur = byPin.get(key);
+    const ok = row.tag && typeof row.tag === "object";
+    const preferred = ok && preferVersion && row.prompt_version === preferVersion;
+    if (!cur) {
+      byPin.set(key, { row, ok, preferred });
+      continue;
+    }
+    if (preferred || (ok && !cur.preferred) || (!ok && !cur.ok)) byPin.set(key, { row, ok, preferred });
+  }
+  return [...byPin.values()].map((v) => v.row);
+}
+
 export function buildProfile({
   domain,
   tags,
   pins,
-  halfLifeDays = 730,
+  halfLifeDays = DEFAULT_HALF_LIFE_DAYS,
   minConfidence = 0.5,
   boardDomains = defaultBoardDomains(),
   usable,
   excludedKey,
   shareKey,
   summarise,
+  extraCoverage = null,
 }) {
   const pinById = new Map();
   for (const p of pins) {
@@ -274,12 +308,22 @@ export function buildProfile({
   let excluded = 0;
   let unjoined = 0;
   const kept = [];
-  for (const row of tags) {
+  let preferVersion = null;
+  try {
+    preferVersion = getDomain(domain).PROMPT_VERSION;
+  } catch {
+    preferVersion = null;
+  }
+  const versions = new Map();
+  const selected = selectTagRows(tags, { preferVersion });
+  for (const row of selected) {
     if (!row || !row.tag || typeof row.tag !== "object") continue;
     const pin = pinById.get(String(row.pin_id));
     const d = resolveDomain(row, pin, boardDomains);
     if (d !== null && d !== domain) continue;
     tagged++;
+    const v = row.prompt_version ?? "unknown";
+    versions.set(v, (versions.get(v) ?? 0) + 1);
     const conf = Number(row.tag.confidence ?? 0);
     if (conf < minConfidence) {
       belowConfidence++;
@@ -318,11 +362,13 @@ export function buildProfile({
     coverage: {
       pins_total: pinById.size,
       tagged,
+      tag_versions: Object.fromEntries([...versions.entries()].sort()),
       below_confidence: belowConfidence,
       [excludedKey]: excluded,
       unjoined,
       used: kept.length,
       [shareKey]: r4(tagged - belowConfidence > 0 ? kept.length / (tagged - belowConfidence) : 0),
+      ...(extraCoverage ? extraCoverage(kept) : {}),
       date_min: dates.length ? iso(dates[0]) : null,
       date_max: dates.length ? iso(dates[dates.length - 1]) : null,
       undated: kept.length - dated.length,
@@ -339,7 +385,7 @@ export function buildProfile({
 // CLI
 
 export function parseArgs(argv) {
-  const args = { tags: DEFAULT_TAGS, pins: DEFAULT_PINS, out: DEFAULT_OUT, boards: null, domain: null, halfLifeDays: 730, minConfidence: 0.5 };
+  const args = { tags: DEFAULT_TAGS, pins: DEFAULT_PINS, out: DEFAULT_OUT, boards: null, domain: null, halfLifeDays: DEFAULT_HALF_LIFE_DAYS, minConfidence: 0.5 };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => argv[++i];
@@ -357,7 +403,7 @@ export function parseArgs(argv) {
   return args;
 }
 
-const USAGE = `usage: node pipeline/aggregate.mjs [--domain ${DOMAIN_NAMES.join("|")}] [--tags ${DEFAULT_TAGS}] [--pins ${DEFAULT_PINS}] [--out ${DEFAULT_OUT}] [--half-life-days 730] [--min-confidence 0.5] [--boards ${DEFAULT_BOARDS}]`;
+const USAGE = `usage: node pipeline/aggregate.mjs [--domain ${DOMAIN_NAMES.join("|")}] [--tags ${DEFAULT_TAGS}] [--pins ${DEFAULT_PINS}] [--out ${DEFAULT_OUT}] [--half-life-days ${DEFAULT_HALF_LIFE_DAYS}] [--min-confidence 0.5] [--boards ${DEFAULT_BOARDS}]`;
 
 /** Resolve --out for one domain; `<domain>` is substituted. */
 export function outPathFor(template, domain) {

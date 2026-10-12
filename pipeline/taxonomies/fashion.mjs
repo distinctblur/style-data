@@ -116,7 +116,7 @@ export const FORMULAS = Object.freeze([
 export const FORMULA_IDS = Object.freeze(FORMULAS.map((f) => f.id));
 
 /**
- * v2 formulas (proposal: docs/formula-v2-proposal.md, pending human review).
+ * v2 formulas (docs/formula-v2-proposal.md; owner review 2026-10-12, §8).
  * Derived from the garment sets that co-occur in her outfit pins: a base
  * (jeans / skirt / dress / trouser / leggings / shorts / swim), the layer(s)
  * over it, and the accessory that finishes it. Each slot is
@@ -126,6 +126,13 @@ export const FORMULA_IDS = Object.freeze(FORMULAS.map((f) => f.id));
  * three stylist formulas are kept under their v1 ids even though they are rare
  * in her pins, because Atelier's methodology names them. List order is the
  * tie-break, so the signature looks come first.
+ *
+ * A pin cropped to the top half (a `top` garment, no bottom / dress / swim) is
+ * matched with an implied `jeans` base (§8 decision 2), so there is no
+ * "no visible base" formula. v1's `matching-set` and `tonal-monochrome` are
+ * deliberately absent (§8 decision 4): they are colour / fabric relations, not
+ * garment slots, and the matcher could never produce them; a separate optional
+ * `styling` field is their future home if they are wanted back.
  */
 const slot = (name, any, required = true) => ({ name, any: Object.freeze([...any]), required });
 const req = (name, ...any) => slot(name, any, true);
@@ -145,6 +152,11 @@ export const FORMULAS_V2 = Object.freeze([
   { id: "jeans+blazer+tee", slots: [req("base", "jeans"), req("layer", "blazer"), req("under", ...TEE, ...COLLAR), opt("accessory", "necklace", "sunglasses", "scarf", "belt"), opt("shoe", "shoes")] },
   { id: "jeans+shirt+belt", slots: [req("base", "jeans"), req("top", ...COLLAR), req("accessory", "belt", "necklace", "bracelet", "watch"), opt("shoe", "shoes"), opt("eyewear", "sunglasses")] },
   { id: "jeans+tee+sunglasses", slots: [req("base", "jeans"), req("top", ...TEE), req("accessory", "sunglasses", "scarf", "necklace", "belt", "bracelet", "hat"), opt("layer", "outerwear"), opt("shoe", "shoes")] },
+  // Plain pairs (§8 decision 1): base + one layer with nothing finishing it.
+  // Four slots each, so every three-slot jeans formula above (five slots) wins
+  // a tie on score; a pin with an accessory therefore lands on the richer one.
+  { id: "jeans+tee", slots: [req("base", "jeans"), req("top", ...TEE), opt("layer", "outerwear"), opt("shoe", "shoes")] },
+  { id: "jeans+knit", slots: [req("base", "jeans"), req("layer", "knit-sweater", "cardigan"), opt("under", ...TEE, ...COLLAR), opt("shoe", "shoes")] },
   // --- skirt ----------------------------------------------------------------------
   { id: "skirt+knit+boot", slots: [req("base", ...BASE_SKIRT), req("top", "knit-sweater", "cardigan"), req("shoe", ...BOOTS), opt("legs", "tights"), opt("accessory", "necklace", "belt", "scarf")] },
   { id: "midi-skirt+fitted-top", slots: [req("base", "midi-skirt"), req("top", "top"), opt("shoe", "shoes"), opt("accessory", "belt", "necklace")] },
@@ -163,8 +175,6 @@ export const FORMULAS_V2 = Object.freeze([
   // --- shorts / swim ----------------------------------------------------------------
   { id: "shorts+top+sandal", slots: [req("base", "shorts"), req("top", "top"), opt("shoe", "sandal", "sneaker", "espadrille", "slide"), opt("accessory", "sunglasses", "belt", "hat", "necklace")] },
   { id: "swim+cover-up", slots: [req("base", "one-piece", "bikini", "tankini", "swim-skirt", "rash-guard"), opt("cover", "cover-up", "kaftan", "sarong"), opt("accessory", "hat", "sunglasses", "necklace", "bracelet", "earrings", "sandal", "slide", "espadrille", "basket")] },
-  // --- no visible base (pin cropped to the top half): her signature collar-under-knit
-  { id: "knit+shirt+necklace", slots: [req("layer", "knit-sweater", "cardigan"), req("under", ...COLLAR), opt("accessory", "necklace", "watch", "bracelet", "scarf")] },
   { id: "other", slots: [] },
 ]);
 export const FORMULA_V2_IDS = Object.freeze(FORMULAS_V2.map((f) => f.id));
@@ -247,8 +257,10 @@ export function buildTagSchema(formulaIds) {
   propertyOrdering: ["is_outfit", "garments", "formula", "silhouette", "formality", "season", "occasion", "vibe_keywords", "confidence"],
   });
 }
-export const tagSchema = buildTagSchema(FORMULA_IDS);
+export const tagSchemaV1 = buildTagSchema(FORMULA_IDS);
 export const tagSchemaV2 = buildTagSchema(FORMULA_V2_IDS);
+/** Domain-interface alias: the current schema (v2 since the 2026-10-12 review). */
+export const tagSchema = tagSchemaV2;
 
 // --- Validation ---------------------------------------------------------------
 
@@ -257,13 +269,16 @@ const inEnum = (list, v) => list.includes(v);
 
 const FORMULA_IDS_BY_VERSION = Object.freeze({ v1: FORMULA_IDS, v2: FORMULA_V2_IDS });
 
+/** The version the domain-interface aliases (PROMPT_VERSION, TAG_PROMPT, tagSchema, validateTag) resolve to. */
+export const DEFAULT_VERSION = "v2";
+
 /**
  * Validate a tag object against the taxonomy.
  * @param {object} tag
- * @param {{version?: "v1"|"v2"}} [opts]  which formula enum applies (default v1)
+ * @param {{version?: "v1"|"v2"}} [opts]  which formula enum applies (default DEFAULT_VERSION, v2)
  * @returns {{ok: boolean, errors: string[]}}
  */
-export function validateTag(tag, { version = "v1" } = {}) {
+export function validateTag(tag, { version = DEFAULT_VERSION } = {}) {
   const formulaIds = FORMULA_IDS_BY_VERSION[version];
   if (!formulaIds) throw new Error(`validateTag: unknown version '${version}' (known: ${Object.keys(FORMULA_IDS_BY_VERSION).join(", ")})`);
   const errors = [];
@@ -326,13 +341,18 @@ export function validateTag(tag, { version = "v1" } = {}) {
   return { ok: errors.length === 0, errors };
 }
 
+/** validateTag against the v1 formula enum (the first live run's rows). */
+export const validateTagV1 = (tag) => validateTag(tag, { version: "v1" });
 /** validateTag against the v2 formula enum. */
 export const validateTagV2 = (tag) => validateTag(tag, { version: "v2" });
 
 // --- Prompt (reviewable constant; bump PROMPT_VERSION when it changes) ---------
 
 export const DOMAIN = "fashion";
-export const PROMPT_VERSION = "fashion.tag.v1";
+export const PROMPT_VERSION_V1 = "fashion.tag.v1";
+export const PROMPT_VERSION_V2 = "fashion.tag.v2";
+/** Domain-interface alias: the current prompt version (v2 since the 2026-10-12 review). */
+export const PROMPT_VERSION = PROMPT_VERSION_V2;
 
 const list = (xs) => xs.join(", ");
 
@@ -373,24 +393,25 @@ export const TAG_PROMPT_FASHION_V1 = buildTagPrompt({
 });
 
 /**
- * v2 prompt (pending human review, docs/formula-v2-proposal.md): the v1 text
- * with the v2 formula list spelled out as base + layer + accessory slots, and
- * the rule that layering accessories count toward the formula.
+ * v2 prompt (owner-reviewed 2026-10-12, docs/formula-v2-proposal.md §8): the
+ * v1 text with the v2 formula list spelled out as base + layer + accessory
+ * slots, the rule that layering accessories count toward the formula, and the
+ * cropped-pin rule that mirrors the matcher's implied jeans base.
  */
 export const TAG_PROMPT_FASHION_V2 = buildTagPrompt({
   formulaText: `one id from this list; each is a base + layer + accessory (required slots, then optional ones in brackets; '|' separates the pieces that can fill a slot):\n${FORMULA_V2_LINES.map((l) => `    ${l}`).join("\n")}`,
-  formulaRule: "the formula whose required slots the look fills, preferring the one that fills the most slots. Layering accessories count toward the formula: a necklace, scarf, belt, sunglasses, watch or bracelet worn with the base and layer fills that formula's accessory slot, so a knit over a collared shirt with a necklace is 'jeans+knit+shirt' (jeans visible) or 'knit+shirt+necklace' (cropped), not 'other'. Use 'other' only when no formula's required slots are filled. For a non-outfit image choose the formula the pieces most suggest, or 'other'.",
+  formulaRule: "the formula whose required slots the look fills, preferring the one that fills the most slots. Layering accessories count toward the formula: a necklace, scarf, belt, sunglasses, watch or bracelet worn with the base and layer fills that formula's accessory slot, so a knit over a collared shirt with a necklace over jeans is 'jeans+knit+shirt', not 'other'. If the bottom half is cropped out, assume jeans when choosing the formula. Use 'other' only when no formula's required slots are filled. For a non-outfit image choose the formula the pieces most suggest, or 'other'.",
 });
-export const PROMPT_VERSION_V2 = "fashion.tag.v2";
 
-/** Domain-interface alias: the current prompt for this domain (v1 until the v2 review). */
-export const TAG_PROMPT = TAG_PROMPT_FASHION_V1;
+/** Domain-interface alias: the current prompt for this domain (v2 since the 2026-10-12 review). */
+export const TAG_PROMPT = TAG_PROMPT_FASHION_V2;
 
 /**
  * Selectable prompt versions for tag.mjs `--prompt-version`. Each entry is a
- * complete tagging contract; the domain-level exports above are `v1`.
+ * complete tagging contract; the domain-level aliases above are
+ * `VERSIONS[DEFAULT_VERSION]`. v1 stays selectable for the first live run's rows.
  */
 export const VERSIONS = Object.freeze({
-  v1: Object.freeze({ PROMPT_VERSION, TAG_PROMPT: TAG_PROMPT_FASHION_V1, tagSchema, validateTag, FORMULA_IDS }),
+  v1: Object.freeze({ PROMPT_VERSION: PROMPT_VERSION_V1, TAG_PROMPT: TAG_PROMPT_FASHION_V1, tagSchema: tagSchemaV1, validateTag: validateTagV1, FORMULA_IDS }),
   v2: Object.freeze({ PROMPT_VERSION: PROMPT_VERSION_V2, TAG_PROMPT: TAG_PROMPT_FASHION_V2, tagSchema: tagSchemaV2, validateTag: validateTagV2, FORMULA_IDS: FORMULA_V2_IDS }),
 });

@@ -76,10 +76,10 @@ node pipeline/upload-images.mjs [--limit 20] [--concurrency 2]
 #    each object: wrangler r2 object put style-data/<key> --file <path> --content-type <mime> --remote
 
 # 4. Tag each pin with its domain's taxonomy (Gemini vision; mock without key)
-node pipeline/tag.mjs --domain fashion
-node pipeline/tag.mjs --domain home             # → data/tags.jsonl
+node pipeline/tag.mjs --domain fashion          # fashion.tag.v2 by default; --prompt-version v1 still selectable
+node pipeline/tag.mjs --domain home             # → data/tags.jsonl (home.tag.v1)
 
-# 5. Aggregate tags into the per-domain profile
+# 5. Aggregate tags into the per-domain profile (recency half-life 1095 days; --half-life-days N to override)
 node pipeline/aggregate.mjs --domain fashion    # → data/profiles/fashion.taste-profile.json
 
 # 6. Draft the Atelier standing profile for her to correct (Claude; mock without key)

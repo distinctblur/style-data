@@ -1,17 +1,20 @@
 // style-data — fashion domain summariser for aggregate.mjs (Atelier D10 seed input).
 //
 // Used set: tag non-null, confidence >= threshold, is_outfit !== false. Emits
-// formula_weights (the model's v1 answer), formula_weights_v2 (FORMULAS_V2
-// assigned deterministically from each pin's garments by formula-assign.mjs,
-// with formula_v2_coverage = 1 - the `other` share), silhouettes, formality histogram/mean, seasons, occasions,
-// palette (neutrals / secondary / accent), dominant_colors (pins' dominant hex
-// bucketed to named hues), garment_mix, subcategory_top, vibe_keywords_top and
-// absences. Tag strings are opaque; the neutral set comes from the fashion
-// taxonomy and the absence candidates below match loosely.
+// formula_weights (the model's answer under whichever prompt tagged the row),
+// formula_weights_v2 (FORMULAS_V2 assigned deterministically from each pin's
+// garments by formula-assign.mjs, with formula_v2_coverage = 1 - the `other`
+// share), silhouettes, formality histogram/mean, seasons, occasions, palette
+// (neutrals / secondary / accent), dominant_colors (pins' dominant hex bucketed
+// to named hues), garment_mix, subcategory_top, vibe_keywords_top and absences.
+// `coverage.assumed_base_count` is how many used pins the matcher treated as a
+// top-half crop with an implied jeans base (formula-assign.mjs, impliedBase).
+// Tag strings are opaque; the neutral set comes from the fashion taxonomy and
+// the absence candidates below match loosely.
 
 import { NEUTRALS as TAXONOMY_NEUTRALS } from "./taxonomies/fashion.mjs";
-import { assignFormula } from "./formula-assign.mjs";
-import { Counter, buildProfile, r4, splitPalette, scanAbsences } from "./aggregate.mjs";
+import { assignFormula, impliedBase } from "./formula-assign.mjs";
+import { Counter, DEFAULT_HALF_LIFE_DAYS, buildProfile, r4, splitPalette, scanAbsences } from "./aggregate.mjs";
 
 // Brief §2.3: base neutrals are the 60–70% layer. The taxonomy is the single
 // source of truth; the extra spellings only matter for hand-written fixtures
@@ -112,11 +115,11 @@ export const ABSENCE_CANDIDATES = {
  * @param {object} opts
  * @param {object[]} opts.tags   parsed tags.jsonl rows
  * @param {object[]} opts.pins   parsed pins.jsonl rows
- * @param {number} [opts.halfLifeDays=730]
+ * @param {number} [opts.halfLifeDays=1095]
  * @param {number} [opts.minConfidence=0.5]
  * @param {Map<string,string>} [opts.boardDomains]  board slug -> domain (default: boards.json)
  */
-export function aggregateFashion({ tags, pins, halfLifeDays = 730, minConfidence = 0.5, boardDomains } = {}) {
+export function aggregateFashion({ tags, pins, halfLifeDays = DEFAULT_HALF_LIFE_DAYS, minConfidence = 0.5, boardDomains } = {}) {
   return buildProfile({
     domain: "fashion",
     tags,
@@ -128,6 +131,7 @@ export function aggregateFashion({ tags, pins, halfLifeDays = 730, minConfidence
     excludedKey: "not_outfit",
     shareKey: "outfit_share",
     summarise,
+    extraCoverage: (rows) => ({ assumed_base_count: rows.filter((r) => impliedBase(r.tag.garments) !== null).length }),
   });
 }
 

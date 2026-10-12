@@ -22,10 +22,13 @@
 // successful record, so a later re-tag under a new prompt version never
 // collides with the old rows.
 //
-// PROMPT VERSIONS: `--prompt-version v1|v2` (default v1) selects one of the
-// domain module's `VERSIONS` entries (prompt, responseSchema, validator and
-// `PROMPT_VERSION` string). Today only fashion has a v2 (FORMULAS_V2, pending
-// the human prompt review); asking for a version a domain lacks fails fast.
+// PROMPT VERSIONS: `--prompt-version v1|v2` selects one of the domain module's
+// `VERSIONS` entries (prompt, responseSchema, validator and `PROMPT_VERSION`
+// string). Without the flag each domain runs at its own current version
+// (`DEFAULT_VERSION`, else v1): fashion is v2 since the owner review of
+// 2026-10-12 (docs/formula-v2-proposal.md §8), home is v1. Asking for a version
+// a domain lacks fails fast. Rows without a `prompt_version` predate versioning
+// and count as v1 for `--only-missing`, never as the current default.
 //
 // MOCK MODE: with `--mock`, or when no GEMINI_API_KEY resolves (env, then
 // ./.dev.vars), every pin gets a deterministic, schema-valid tag for its domain
@@ -46,7 +49,6 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
 
 export const DEFAULT_DOMAIN = "fashion";
-export const DEFAULT_PROMPT_VERSION = "v1";
 export const DEFAULT_MODEL = "gemini-3.6-flash";
 export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 export const REQUEST_TIMEOUT_MS = 60_000;
@@ -75,22 +77,45 @@ export function resolveApiKey(env = process.env) {
 // --- Prompt versions ---------------------------------------------------------------
 
 /**
- * The tagging contract {PROMPT_VERSION, TAG_PROMPT, tagSchema, validateTag,
- * FORMULA_IDS?} of a domain at a prompt version. "v1" is every domain's
- * module-level exports; later versions come from the module's `VERSIONS` map.
+ * The prompt version a domain runs at when `--prompt-version` is not given:
+ * the module's `DEFAULT_VERSION` (fashion: "v2"), else "v1".
  * @param {string} domain
- * @param {string} [promptVersion="v1"]
+ */
+export function defaultPromptVersion(domain) {
+  return getDomain(domain).DEFAULT_VERSION ?? "v1";
+}
+
+/**
+ * The prompt version rows without a `prompt_version` were tagged under: the
+ * domain's v1 (the first live run predates versioning), never today's default.
+ * @param {string} domain
+ * @returns {string|null}  null for an unregistered domain
+ */
+export function legacyPromptVersion(domain) {
+  const d = DOMAINS[domain];
+  if (!d) return null;
+  return d.VERSIONS?.v1?.PROMPT_VERSION ?? d.PROMPT_VERSION;
+}
+
+/**
+ * The tagging contract {PROMPT_VERSION, TAG_PROMPT, tagSchema, validateTag,
+ * FORMULA_IDS?} of a domain at a prompt version. The domain's default version
+ * is its module-level exports; every version comes from the module's
+ * `VERSIONS` map when it has one.
+ * @param {string} domain
+ * @param {string|null} [promptVersion]  null -> defaultPromptVersion(domain)
  * @throws {Error} when the domain has no such version
  */
-export function resolveVersion(domain, promptVersion = DEFAULT_PROMPT_VERSION) {
+export function resolveVersion(domain, promptVersion = null) {
   const d = getDomain(domain);
-  const v = d.VERSIONS?.[promptVersion];
+  const want = promptVersion ?? defaultPromptVersion(domain);
+  const v = d.VERSIONS?.[want];
   if (v) return v;
-  if (promptVersion === DEFAULT_PROMPT_VERSION) {
+  if (want === defaultPromptVersion(domain)) {
     return { PROMPT_VERSION: d.PROMPT_VERSION, TAG_PROMPT: d.TAG_PROMPT, tagSchema: d.tagSchema, validateTag: d.validateTag, FORMULA_IDS: d.FORMULA_IDS };
   }
   const known = Object.keys(d.VERSIONS ?? { v1: 1 }).join(", ");
-  throw new Error(`domain '${domain}' has no prompt version '${promptVersion}' (known: ${known})`);
+  throw new Error(`domain '${domain}' has no prompt version '${want}' (known: ${known})`);
 }
 
 // --- Domain routing -------------------------------------------------------------
@@ -133,7 +158,7 @@ function pickDistinct(h, xs, n, seed) {
 const MOCK_FASHION_VIBES = ["minimal", "coastal", "tailored", "boho", "polished", "sporty", "relaxed", "preppy", "romantic", "edgy", "classic", "tonal"];
 const MOCK_HOME_VIBES = ["warm", "layered", "airy", "textured", "cosy", "sculptural", "calm", "organic", "graphic", "moody", "sunlit", "collected"];
 
-function mockFashionTag(pinId, promptVersion = DEFAULT_PROMPT_VERSION) {
+function mockFashionTag(pinId, promptVersion = null) {
   const F = DOMAINS.fashion;
   const V = resolveVersion("fashion", promptVersion);
   const h = hashOf(pinId);
@@ -198,9 +223,9 @@ const MOCKS = { fashion: mockFashionTag, home: mockHomeTag };
  * Deterministic, schema-valid tag for the domain, derived from sha256(pin_id).
  * @param {string} pinId
  * @param {string} [domain="fashion"]
- * @param {string} [promptVersion="v1"]  the formula enum the mock draws from
+ * @param {string|null} [promptVersion]  the formula enum the mock draws from (null -> the domain's default)
  */
-export function mockTag(pinId, domain = DEFAULT_DOMAIN, promptVersion = DEFAULT_PROMPT_VERSION) {
+export function mockTag(pinId, domain = DEFAULT_DOMAIN, promptVersion = null) {
   getDomain(domain); // throws for unknown
   resolveVersion(domain, promptVersion); // throws for a version the domain lacks
   const fn = MOCKS[domain];
@@ -211,7 +236,7 @@ export function mockTag(pinId, domain = DEFAULT_DOMAIN, promptVersion = DEFAULT_
 // --- Gemini call ----------------------------------------------------------------
 
 /** generateContent body: the domain's prompt (at the prompt version) + the image, structured output via that version's responseSchema. */
-export function buildRequestBody(image, domain = DEFAULT_DOMAIN, promptVersion = DEFAULT_PROMPT_VERSION) {
+export function buildRequestBody(image, domain = DEFAULT_DOMAIN, promptVersion = null) {
   const v = resolveVersion(domain, promptVersion);
   return {
     contents: [{ role: "user", parts: [{ text: v.TAG_PROMPT }, { inlineData: { mimeType: image.mimeType, data: image.data } }] }],
@@ -230,7 +255,7 @@ const retryable = (status) => status === 429 || status >= 500;
  * One generateContent call with one retry on 429/5xx/network error.
  * Returns {ok, status, json|null, error|null, attempts}; never throws.
  */
-export async function callGemini({ fetchImpl, apiKey, model, image, domain = DEFAULT_DOMAIN, promptVersion = DEFAULT_PROMPT_VERSION, backoffMs = 2000, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) }) {
+export async function callGemini({ fetchImpl, apiKey, model, image, domain = DEFAULT_DOMAIN, promptVersion = null, backoffMs = 2000, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) }) {
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   const body = JSON.stringify(buildRequestBody(image, domain, promptVersion));
   let last = null;
@@ -287,13 +312,14 @@ const tagKey = (pinId, domain, promptVersion) => `${domain}\u0000${promptVersion
  * (pin_id, domain, prompt_version) keys that already have a successful
  * (tag != null) record in the output file. A record's prompt_version is the
  * stored string (e.g. "fashion.tag.v1"); legacy rows without one are keyed as
- * the domain's default version so the first live run still counts as done.
+ * the domain's v1 (legacyPromptVersion) so the first live run still counts as
+ * done for v1 and never as done for a later default.
  */
 export function taggedKeys(outPath) {
   const keys = new Set();
   for (const r of readJsonl(outPath)) {
     if (r.tag == null || !r.domain) continue;
-    const pv = r.prompt_version ?? (DOMAINS[r.domain] ? DOMAINS[r.domain].PROMPT_VERSION : null);
+    const pv = r.prompt_version ?? legacyPromptVersion(r.domain);
     if (!pv) continue;
     keys.add(tagKey(r.pin_id, r.domain, pv));
   }
@@ -334,7 +360,7 @@ async function runPool(items, n, worker) {
  * @param {string} [opts.model]
  * @param {number} [opts.concurrency]
  * @param {boolean} [opts.onlyMissing]    skip (pin_id, domain, prompt_version) triples that already have a successful record
- * @param {string} [opts.promptVersion]   "v1" (default) or another entry of the domain's VERSIONS (fashion: "v2")
+ * @param {string|null} [opts.promptVersion]  an entry of the domain's VERSIONS ("v1", fashion also "v2"); null (default) -> each domain's own default (fashion v2, home v1)
  * @param {boolean} [opts.mock]           force mock mode
  * @param {string|null} [opts.apiKey]     resolved key; null -> mock mode
  * @param {number|null} [opts.priceIn]    USD per million input tokens
@@ -347,7 +373,7 @@ export async function tagPins(opts, deps = {}) {
   const {
     inPath, outPath, domain = null, boardsPath = DEFAULT_BOARDS_PATH, limit = Infinity, model = DEFAULT_MODEL,
     concurrency = 4, onlyMissing = false, priceIn = null, priceOut = null, backoffMs = 2000, log = (m) => console.error(m),
-    promptVersion = DEFAULT_PROMPT_VERSION,
+    promptVersion = null,
   } = opts;
   if (domain != null) resolveVersion(domain, promptVersion); // fail fast on a typo or a version the domain lacks
   const fetchImpl = deps.fetchImpl ?? globalThis.fetch;
@@ -386,7 +412,7 @@ export async function tagPins(opts, deps = {}) {
   if (summary.skippedBy.other_domain) log(`skip ${summary.skippedBy.other_domain} pins of other domains (--domain ${domain})`);
   const todoByDomain = {};
   for (const t of todo) todoByDomain[t.domain] = (todoByDomain[t.domain] ?? 0) + 1;
-  log(`${mock ? "mock mode" : `live mode (${model})`}: ${todo.length} pins to tag (${Object.entries(todoByDomain).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}), prompt version ${promptVersion}, concurrency ${mock ? 1 : concurrency}`);
+  log(`${mock ? "mock mode" : `live mode (${model})`}: ${todo.length} pins to tag (${Object.entries(todoByDomain).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}), prompt version ${promptVersion ?? `default (${Object.keys(todoByDomain).map((k) => `${k} ${defaultPromptVersion(k)}`).join(", ") || "per domain"})`}, concurrency ${mock ? 1 : concurrency}`);
 
   fs.mkdirSync(path.dirname(path.resolve(outPath)), { recursive: true });
   const emit = (rec) => {
@@ -443,7 +469,7 @@ export async function tagPins(opts, deps = {}) {
 export function formatSummary(s) {
   const perDomain = Object.entries(s.byDomain ?? {}).map(([k, v]) => `${k} ${v.tagged}/${v.tagged + v.failed}`).join(", ");
   const lines = [
-    `--- tag.mjs summary (${s.mode === "live" ? `live, ${s.model}` : "mock"}${s.domain ? `, --domain ${s.domain}` : ""}${s.promptVersion && s.promptVersion !== DEFAULT_PROMPT_VERSION ? `, --prompt-version ${s.promptVersion}` : ""}) ---`,
+    `--- tag.mjs summary (${s.mode === "live" ? `live, ${s.model}` : "mock"}${s.domain ? `, --domain ${s.domain}` : ""}${s.promptVersion ? `, --prompt-version ${s.promptVersion}` : ""}) ---`,
     `tagged ${s.tagged}  failed ${s.failed}  skipped ${s.skipped}${s.skipped ? ` (${Object.entries(s.skippedBy).map(([k, v]) => `${k} ${v}`).join(", ")})` : ""}${perDomain ? `  by domain: ${perDomain}` : ""}`,
     `tokens: prompt ${s.promptTokens}  output ${s.outputTokens}  total ${s.totalTokens}`,
     `cost: ${s.costUsd == null ? "unknown (pass --price-in/--price-out USD per Mtok)" : `$${s.costUsd.toFixed(4)}`}`,
@@ -468,7 +494,7 @@ export function parseCli(argv) {
       mock: { type: "boolean", default: false },
       "price-in": { type: "string" },
       "price-out": { type: "string" },
-      "prompt-version": { type: "string", default: DEFAULT_PROMPT_VERSION },
+      "prompt-version": { type: "string" },
     },
   });
   const num = (v, name) => {
@@ -480,8 +506,9 @@ export function parseCli(argv) {
   if (values.domain !== undefined && !DOMAINS[values.domain]) {
     throw new Error(`--domain must be one of: ${DOMAIN_NAMES.join(", ")} (got '${values.domain}')`);
   }
-  if (!/^v\d+$/.test(values["prompt-version"])) throw new Error(`--prompt-version must look like v1 or v2 (got '${values["prompt-version"]}')`);
-  if (values.domain !== undefined) resolveVersion(values.domain, values["prompt-version"]); // throws: domain lacks the version
+  const promptVersion = values["prompt-version"] ?? null;
+  if (promptVersion !== null && !/^v\d+$/.test(promptVersion)) throw new Error(`--prompt-version must look like v1 or v2 (got '${promptVersion}')`);
+  if (values.domain !== undefined) resolveVersion(values.domain, promptVersion); // throws: domain lacks the version
   return {
     domain: values.domain ?? null,
     boardsPath: values.boards,
@@ -494,7 +521,7 @@ export function parseCli(argv) {
     mock: values.mock,
     priceIn: num(values["price-in"], "price-in"),
     priceOut: num(values["price-out"], "price-out"),
-    promptVersion: values["prompt-version"],
+    promptVersion,
   };
 }
 

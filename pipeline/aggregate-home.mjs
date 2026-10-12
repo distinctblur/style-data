@@ -12,7 +12,7 @@
 // pin listing eight pieces does not outvote one listing two; pin-level lists
 // (styles, vibe keywords) likewise split across their entries.
 
-import { Counter, buildProfile, r4, splitPalette, scanAbsences } from "./aggregate.mjs";
+import { Counter, DEFAULT_HALF_LIFE_DAYS, buildProfile, r4, splitPalette, scanAbsences } from "./aggregate.mjs";
 
 /** Neutral colours for the home palette split (ADR-0001 #4). */
 export const HOME_NEUTRALS = new Set([
@@ -92,11 +92,11 @@ export const ABSENCE_CANDIDATES = {
  * @param {object} opts
  * @param {object[]} opts.tags   parsed tags.jsonl rows
  * @param {object[]} opts.pins   parsed pins.jsonl rows
- * @param {number} [opts.halfLifeDays=730]
+ * @param {number} [opts.halfLifeDays=1095]
  * @param {number} [opts.minConfidence=0.5]
  * @param {Map<string,string>} [opts.boardDomains]  board slug -> domain (default: boards.json)
  */
-export function aggregateHome({ tags, pins, halfLifeDays = 730, minConfidence = 0.5, boardDomains } = {}) {
+export function aggregateHome({ tags, pins, halfLifeDays = DEFAULT_HALF_LIFE_DAYS, minConfidence = 0.5, boardDomains } = {}) {
   return buildProfile({
     domain: "home",
     tags,

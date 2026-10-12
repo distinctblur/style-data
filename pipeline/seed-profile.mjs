@@ -48,7 +48,7 @@ export const SECTIONS = [
 
 export const SEED_PROMPT_V1 = `You are drafting a standing style profile for one person from a statistical summary of her Pinterest boards. You are writing TO her, in the second person, and every sentence is a hypothesis for her to confirm or correct — not a verdict. She will edit this before anything is saved.
 
-Input: a JSON "taste profile". It has \`overall\` plus one entry per board under \`boards\` (the boards are "my-style" and "swim-look"). Every list is sorted by \`weight\`, a recency-weighted share between 0 and 1 (newer pins count more); \`count\` is the raw number of pins behind it. \`palette\` is already split into neutrals / secondary / accent; \`absences\` lists conventional things that appear at most once. \`coverage\` says how many pins were used and the date range.
+Input: a JSON "taste profile". It has \`overall\` plus one entry per board under \`boards\` (the boards are "my-style" and "swim-look"). Every list is sorted by \`weight\`, a recency-weighted share between 0 and 1 (newer pins count more); \`count\` is the raw number of pins behind it. Where a share and its raw count disagree (a large count with a small share), say that it was a bigger interest in the past. \`palette\` is already split into neutrals / secondary / accent; \`absences\` lists conventional things that appear at most once. \`coverage\` says how many pins were used and the date range.
 
 Write markdown with exactly these six H2 headings, in this order, with these exact texts:
 

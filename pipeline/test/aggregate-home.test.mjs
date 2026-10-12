@@ -92,6 +92,7 @@ test("envelope and key order: {version, domain, coverage, overall, boards}", () 
   assert.deepEqual(Object.keys(p.coverage), [
     "pins_total",
     "tagged",
+    "tag_versions",
     "below_confidence",
     "not_interior",
     "unjoined",
@@ -154,7 +155,13 @@ test("recency weighting favours newer pins at equal counts", () => {
   assert.equal(newer.count, 1);
   assert.equal(older.count, 1);
   assert.ok(newer.weight > older.weight);
-  assert.ok(older.weight / newer.weight < 0.3);
+  // 1415 days at the default 3-year half-life: 0.5^(1415/1095) ≈ 0.41.
+  assert.equal(p.coverage.half_life_days, 1095, "home shares the 1095-day default");
+  approx(older.weight / newer.weight, Math.pow(0.5, 1415 / 1095), 2e-3);
+  // The old 2-year half-life, passed explicitly, is steeper.
+  const steep = run({ halfLifeDays: 730 });
+  const bySteep = Object.fromEntries(steep.overall.rooms.map((r) => [r.room, r]));
+  assert.ok(bySteep["home-office"].weight / bySteep.kitchen.weight < 0.3);
   const flat = run({ halfLifeDays: 100000 });
   const byFlat = Object.fromEntries(flat.overall.rooms.map((r) => [r.room, r]));
   approx(byFlat.kitchen.weight, byFlat["home-office"].weight, 2e-3);

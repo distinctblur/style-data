@@ -4,15 +4,20 @@
   "coverage": {
     "pins_total": 627,
     "tagged": 613,
+    "tag_versions": {
+      "fashion.tag.v1": 11,
+      "fashion.tag.v2": 602
+    },
     "below_confidence": 0,
-    "not_outfit": 181,
+    "not_outfit": 179,
     "unjoined": 0,
-    "used": 432,
-    "outfit_share": 0.7047,
+    "used": 434,
+    "outfit_share": 0.708,
+    "assumed_base_count": 20,
     "date_min": "2012-03-09",
     "date_max": "2026-08-17",
     "undated": 0,
-    "half_life_days": 730,
+    "half_life_days": 1095,
     "min_confidence": 0.5,
     "boards": [
       "my-style",
@@ -20,1836 +25,1930 @@
     ]
   },
   "overall": {
-    "pins_used": 432,
-    "weight_total": 51.3699,
+    "pins_used": 434,
+    "weight_total": 84.1933,
     "formula_weights": [
       {
         "formula": "other",
-        "weight": 0.5801,
-        "count": 268
+        "weight": 0.1711,
+        "count": 60
       },
       {
-        "formula": "shorts+shirt+sandal",
-        "weight": 0.0683,
-        "count": 13
-      },
-      {
-        "formula": "athleisure",
-        "weight": 0.0519,
-        "count": 26
-      },
-      {
-        "formula": "swimsuit+cover-up+sandal",
-        "weight": 0.0518,
-        "count": 5
-      },
-      {
-        "formula": "jeans+tee+sneaker",
-        "weight": 0.0434,
-        "count": 14
-      },
-      {
-        "formula": "jeans+shirt+flat",
-        "weight": 0.0353,
-        "count": 17
-      },
-      {
-        "formula": "jeans+knit+boot",
-        "weight": 0.031,
+        "formula": "shorts+top+sandal",
+        "weight": 0.0957,
         "count": 31
       },
       {
-        "formula": "swimsuit-only",
-        "weight": 0.0307,
-        "count": 5
+        "formula": "dress+necklace+sandal",
+        "weight": 0.0701,
+        "count": 14
       },
       {
-        "formula": "jeans+blazer+heel",
-        "weight": 0.0274,
-        "count": 12
+        "formula": "athleisure",
+        "weight": 0.0584,
+        "count": 26
       },
       {
-        "formula": "matching-set",
-        "weight": 0.0258,
-        "count": 6
+        "formula": "jeans+tee+sunglasses",
+        "weight": 0.0549,
+        "count": 26
       },
       {
-        "formula": "tonal-monochrome",
-        "weight": 0.0219,
-        "count": 7
+        "formula": "swim+cover-up",
+        "weight": 0.0546,
+        "count": 9
       },
       {
-        "formula": "midi-skirt+fitted-top",
-        "weight": 0.0159,
-        "count": 8
+        "formula": "jeans+blazer+tee",
+        "weight": 0.0518,
+        "count": 28
       },
       {
-        "formula": "tailored-trouser+shirt+heel",
-        "weight": 0.0114,
-        "count": 5
+        "formula": "jeans+knit",
+        "weight": 0.0515,
+        "count": 17
       },
       {
-        "formula": "midi-dress+boot",
-        "weight": 0.0021,
-        "count": 5
+        "formula": "jeans+shirt+belt",
+        "weight": 0.0489,
+        "count": 16
       },
       {
-        "formula": "cardigan+skirt+flat",
-        "weight": 0.0017,
-        "count": 5
+        "formula": "jeans+tee",
+        "weight": 0.0381,
+        "count": 9
+      },
+      {
+        "formula": "skirt+top+heel",
+        "weight": 0.0358,
+        "count": 24
+      },
+      {
+        "formula": "jeans+cardigan+tee",
+        "weight": 0.0352,
+        "count": 27
       },
       {
         "formula": "knit+trouser+loafer",
-        "weight": 0.0009,
+        "weight": 0.0304,
+        "count": 14
+      },
+      {
+        "formula": "jeans+knit+necklace",
+        "weight": 0.0289,
+        "count": 9
+      },
+      {
+        "formula": "jeans+knit+scarf",
+        "weight": 0.0289,
+        "count": 19
+      },
+      {
+        "formula": "trouser+shirt+heel",
+        "weight": 0.0263,
+        "count": 11
+      },
+      {
+        "formula": "jeans+knit+shirt",
+        "weight": 0.024,
+        "count": 28
+      },
+      {
+        "formula": "leggings+knit+boot",
+        "weight": 0.0233,
+        "count": 17
+      },
+      {
+        "formula": "skirt+knit+boot",
+        "weight": 0.0187,
+        "count": 15
+      },
+      {
+        "formula": "jeans+tee+sneaker",
+        "weight": 0.0126,
         "count": 3
       },
       {
-        "formula": "mini-skirt+jacket+boot",
-        "weight": 0.0003,
-        "count": 1
+        "formula": "dress+cardigan",
+        "weight": 0.0119,
+        "count": 13
       },
       {
-        "formula": "shirt-dress+flat",
-        "weight": 0.0001,
+        "formula": "dress+boot",
+        "weight": 0.0116,
+        "count": 11
+      },
+      {
+        "formula": "blazer+wide-leg-trouser+loafer",
+        "weight": 0.0085,
+        "count": 3
+      },
+      {
+        "formula": "midi-skirt+fitted-top",
+        "weight": 0.0079,
+        "count": 3
+      },
+      {
+        "formula": "tailored-trouser+shirt+heel",
+        "weight": 0.001,
         "count": 1
       }
     ],
     "formula_weights_v2": [
       {
-        "formula": "other",
-        "weight": 0.1624,
-        "count": 54
-      },
-      {
         "formula": "dress+necklace+sandal",
-        "weight": 0.138,
+        "weight": 0.111,
         "count": 25
       },
       {
         "formula": "shorts+top+sandal",
-        "weight": 0.1047,
+        "weight": 0.0963,
         "count": 32
       },
       {
-        "formula": "swim+cover-up",
-        "weight": 0.0811,
-        "count": 9
-      },
-      {
         "formula": "athleisure",
-        "weight": 0.0701,
+        "weight": 0.0776,
         "count": 36
       },
       {
-        "formula": "jeans+shirt+belt",
-        "weight": 0.0643,
-        "count": 19
-      },
-      {
-        "formula": "knit+trouser+loafer",
-        "weight": 0.06,
-        "count": 27
-      },
-      {
         "formula": "jeans+tee+sunglasses",
-        "weight": 0.0573,
-        "count": 22
+        "weight": 0.07,
+        "count": 28
       },
       {
-        "formula": "skirt+top+heel",
-        "weight": 0.0459,
-        "count": 25
-      },
-      {
-        "formula": "jeans+blazer+tee",
-        "weight": 0.0443,
-        "count": 25
-      },
-      {
-        "formula": "trouser+shirt+heel",
-        "weight": 0.0373,
-        "count": 16
-      },
-      {
-        "formula": "jeans+cardigan+tee",
-        "weight": 0.0279,
-        "count": 23
-      },
-      {
-        "formula": "jeans+knit+necklace",
-        "weight": 0.0244,
-        "count": 13
-      },
-      {
-        "formula": "dress+boot",
-        "weight": 0.0166,
-        "count": 12
-      },
-      {
-        "formula": "leggings+knit+boot",
-        "weight": 0.0166,
-        "count": 17
-      },
-      {
-        "formula": "blazer+wide-leg-trouser+loafer",
-        "weight": 0.0152,
-        "count": 8
-      },
-      {
-        "formula": "skirt+knit+boot",
-        "weight": 0.0114,
-        "count": 13
-      },
-      {
-        "formula": "jeans+knit+shirt",
-        "weight": 0.0073,
-        "count": 18
-      },
-      {
-        "formula": "dress+cardigan",
-        "weight": 0.0053,
-        "count": 12
-      },
-      {
-        "formula": "jeans+knit+scarf",
-        "weight": 0.0046,
+        "formula": "swim+cover-up",
+        "weight": 0.0665,
         "count": 10
       },
       {
-        "formula": "midi-skirt+fitted-top",
-        "weight": 0.0034,
-        "count": 11
+        "formula": "other",
+        "weight": 0.056,
+        "count": 22
       },
       {
-        "formula": "knit+shirt+necklace",
-        "weight": 0.002,
-        "count": 5
+        "formula": "jeans+shirt+belt",
+        "weight": 0.0513,
+        "count": 19
+      },
+      {
+        "formula": "jeans+blazer+tee",
+        "weight": 0.0509,
+        "count": 25
+      },
+      {
+        "formula": "skirt+top+heel",
+        "weight": 0.0465,
+        "count": 24
+      },
+      {
+        "formula": "knit+trouser+loafer",
+        "weight": 0.0451,
+        "count": 18
+      },
+      {
+        "formula": "trouser+shirt+heel",
+        "weight": 0.0438,
+        "count": 18
+      },
+      {
+        "formula": "jeans+knit+necklace",
+        "weight": 0.0383,
+        "count": 18
+      },
+      {
+        "formula": "jeans+knit",
+        "weight": 0.038,
+        "count": 13
+      },
+      {
+        "formula": "jeans+tee",
+        "weight": 0.0365,
+        "count": 10
+      },
+      {
+        "formula": "jeans+cardigan+tee",
+        "weight": 0.0348,
+        "count": 24
+      },
+      {
+        "formula": "leggings+knit+boot",
+        "weight": 0.0233,
+        "count": 17
+      },
+      {
+        "formula": "jeans+knit+scarf",
+        "weight": 0.0206,
+        "count": 14
+      },
+      {
+        "formula": "jeans+knit+shirt",
+        "weight": 0.0202,
+        "count": 24
+      },
+      {
+        "formula": "dress+boot",
+        "weight": 0.0196,
+        "count": 12
+      },
+      {
+        "formula": "skirt+knit+boot",
+        "weight": 0.0164,
+        "count": 12
+      },
+      {
+        "formula": "blazer+wide-leg-trouser+loafer",
+        "weight": 0.0157,
+        "count": 7
+      },
+      {
+        "formula": "dress+cardigan",
+        "weight": 0.0119,
+        "count": 13
+      },
+      {
+        "formula": "midi-skirt+fitted-top",
+        "weight": 0.0097,
+        "count": 13
       }
     ],
-    "formula_v2_coverage": 0.8376,
+    "formula_v2_coverage": 0.944,
     "silhouettes": [
       {
         "silhouette": "relaxed",
-        "weight": 0.3466,
-        "count": 83
+        "weight": 0.327,
+        "count": 92
       },
       {
         "silhouette": "layered",
-        "weight": 0.1594,
-        "count": 153
-      },
-      {
-        "silhouette": "volume-top-slim-bottom",
-        "weight": 0.1326,
-        "count": 56
+        "weight": 0.1644,
+        "count": 135
       },
       {
         "silhouette": "fitted",
-        "weight": 0.1165,
+        "weight": 0.1573,
+        "count": 71
+      },
+      {
+        "silhouette": "volume-top-slim-bottom",
+        "weight": 0.1412,
         "count": 61
       },
       {
         "silhouette": "straight",
-        "weight": 0.0646,
-        "count": 20
+        "weight": 0.0565,
+        "count": 22
       },
       {
-        "silhouette": "a-line",
-        "weight": 0.0529,
-        "count": 17
-      },
-      {
-        "silhouette": "slim-top-wide-bottom",
-        "weight": 0.0382,
-        "count": 10
-      },
-      {
-        "silhouette": "other",
-        "weight": 0.0322,
-        "count": 5
+        "silhouette": "fit-and-flare",
+        "weight": 0.0433,
+        "count": 11
       },
       {
         "silhouette": "column",
         "weight": 0.0318,
-        "count": 16
+        "count": 14
       },
       {
-        "silhouette": "fit-and-flare",
-        "weight": 0.0238,
-        "count": 9
+        "silhouette": "a-line",
+        "weight": 0.0312,
+        "count": 17
       },
       {
-        "silhouette": "oversized",
-        "weight": 0.0013,
-        "count": 2
+        "silhouette": "slim-top-wide-bottom",
+        "weight": 0.0285,
+        "count": 7
+      },
+      {
+        "silhouette": "other",
+        "weight": 0.0188,
+        "count": 4
       }
     ],
     "formality_histogram": {
       "1": {
-        "weight": 0.1405,
-        "count": 36
+        "weight": 0.1419,
+        "count": 41
       },
       "2": {
-        "weight": 0.4838,
-        "count": 222
+        "weight": 0.4873,
+        "count": 223
       },
       "3": {
-        "weight": 0.2282,
-        "count": 134
+        "weight": 0.2346,
+        "count": 130
       },
       "4": {
-        "weight": 0.1234,
+        "weight": 0.114,
         "count": 32
       },
       "5": {
-        "weight": 0.0241,
+        "weight": 0.0223,
         "count": 8
       }
     },
-    "formality_mean": 2.4069,
+    "formality_mean": 2.3875,
     "seasons": [
       {
         "season": "summer",
-        "weight": 0.4184,
-        "count": 105
+        "weight": 0.3625,
+        "count": 104
       },
       {
         "season": "autumn",
-        "weight": 0.2323,
-        "count": 178
-      },
-      {
-        "season": "all-season",
-        "weight": 0.1559,
-        "count": 41
+        "weight": 0.3116,
+        "count": 180
       },
       {
         "season": "spring",
-        "weight": 0.1481,
-        "count": 92
+        "weight": 0.1466,
+        "count": 89
+      },
+      {
+        "season": "all-season",
+        "weight": 0.1301,
+        "count": 37
       },
       {
         "season": "winter",
-        "weight": 0.0453,
-        "count": 16
+        "weight": 0.0493,
+        "count": 24
       }
     ],
     "occasions": [
       {
         "occasion": "everyday",
-        "weight": 0.3592,
-        "count": 192
+        "weight": 0.4064,
+        "count": 205
       },
       {
         "occasion": "vacation",
-        "weight": 0.1418,
-        "count": 24
+        "weight": 0.12,
+        "count": 23
       },
       {
         "occasion": "weekend",
-        "weight": 0.1071,
-        "count": 57
-      },
-      {
-        "occasion": "party",
-        "weight": 0.0864,
-        "count": 18
-      },
-      {
-        "occasion": "beach",
-        "weight": 0.0723,
-        "count": 11
-      },
-      {
-        "occasion": "travel",
-        "weight": 0.0431,
-        "count": 13
-      },
-      {
-        "occasion": "evening",
-        "weight": 0.0377,
-        "count": 9
+        "weight": 0.098,
+        "count": 48
       },
       {
         "occasion": "work",
-        "weight": 0.0331,
-        "count": 51
+        "weight": 0.0653,
+        "count": 54
       },
       {
-        "occasion": "date-night",
-        "weight": 0.0321,
-        "count": 12
-      },
-      {
-        "occasion": "errands",
-        "weight": 0.0303,
+        "occasion": "party",
+        "weight": 0.0606,
         "count": 16
       },
       {
+        "occasion": "beach",
+        "weight": 0.0599,
+        "count": 12
+      },
+      {
+        "occasion": "evening",
+        "weight": 0.0366,
+        "count": 10
+      },
+      {
+        "occasion": "travel",
+        "weight": 0.0361,
+        "count": 13
+      },
+      {
+        "occasion": "date-night",
+        "weight": 0.0309,
+        "count": 11
+      },
+      {
+        "occasion": "errands",
+        "weight": 0.0283,
+        "count": 14
+      },
+      {
+        "occasion": "gym",
+        "weight": 0.0211,
+        "count": 13
+      },
+      {
         "occasion": "wedding-guest",
-        "weight": 0.0255,
+        "weight": 0.018,
         "count": 3
       },
       {
         "occasion": "brunch",
-        "weight": 0.0167,
-        "count": 13
+        "weight": 0.0158,
+        "count": 11
       },
       {
-        "occasion": "gym",
-        "weight": 0.0147,
-        "count": 13
+        "occasion": "other",
+        "weight": 0.0029,
+        "count": 1
       }
     ],
     "palette": {
       "neutrals": [
         {
           "colour": "black",
-          "weight": 0.2212,
-          "count": 457
+          "weight": 0.212,
+          "count": 456
         },
         {
           "colour": "white",
-          "weight": 0.1249,
-          "count": 234
-        },
-        {
-          "colour": "cream",
-          "weight": 0.053,
-          "count": 70
-        },
-        {
-          "colour": "brown",
-          "weight": 0.0522,
-          "count": 160
+          "weight": 0.1276,
+          "count": 245
         },
         {
           "colour": "grey",
-          "weight": 0.0492,
-          "count": 188
+          "weight": 0.0633,
+          "count": 196
+        },
+        {
+          "colour": "brown",
+          "weight": 0.0521,
+          "count": 159
         },
         {
           "colour": "beige",
+          "weight": 0.0516,
+          "count": 105
+        },
+        {
+          "colour": "cream",
           "weight": 0.0481,
-          "count": 107
+          "count": 72
         },
         {
           "colour": "denim",
-          "weight": 0.0389,
+          "weight": 0.0403,
           "count": 79
         },
         {
           "colour": "tan",
-          "weight": 0.0371,
-          "count": 85
+          "weight": 0.0335,
+          "count": 87
         },
         {
           "colour": "navy",
-          "weight": 0.0238,
-          "count": 46
+          "weight": 0.0228,
+          "count": 44
         },
         {
           "colour": "charcoal",
-          "weight": 0.0196,
-          "count": 34
+          "weight": 0.0126,
+          "count": 26
         },
         {
           "colour": "camel",
-          "weight": 0.0011,
-          "count": 16
+          "weight": 0.0031,
+          "count": 14
         }
       ],
       "secondary": [
         {
           "colour": "gold",
-          "weight": 0.1013,
-          "count": 184
+          "weight": 0.1044,
+          "count": 219
         },
         {
           "colour": "silver",
-          "weight": 0.0676,
-          "count": 75
+          "weight": 0.0604,
+          "count": 86
         }
       ],
       "accent": [
         {
-          "colour": "blue",
-          "weight": 0.0398,
-          "count": 73
+          "colour": "multi",
+          "weight": 0.0426,
+          "count": 105
         },
         {
-          "colour": "multi",
-          "weight": 0.0321,
-          "count": 96
+          "colour": "blue",
+          "weight": 0.0365,
+          "count": 74
+        },
+        {
+          "colour": "light-blue",
+          "weight": 0.0225,
+          "count": 48
         }
       ],
-      "neutral_share": 0.6691,
-      "secondary_share": 0.1689,
-      "accent_share": 0.0719
+      "neutral_share": 0.667,
+      "secondary_share": 0.1648,
+      "accent_share": 0.1016
     },
     "dominant_colors": [
       {
         "hue": "grey",
         "hex": "#808080",
-        "weight": 0.37,
+        "weight": 0.3619,
         "count": 139
       },
       {
         "hue": "beige",
         "hex": "#d2b48c",
-        "weight": 0.1953,
-        "count": 80
+        "weight": 0.2001,
+        "count": 81
       },
       {
         "hue": "cream",
         "hex": "#f5ecd7",
-        "weight": 0.1861,
+        "weight": 0.1744,
         "count": 53
       },
       {
         "hue": "pink",
         "hex": "#e39ab6",
-        "weight": 0.0872,
-        "count": 29
+        "weight": 0.0894,
+        "count": 30
       },
       {
         "hue": "olive",
         "hex": "#6b6b2a",
-        "weight": 0.0569,
+        "weight": 0.0653,
         "count": 34
       },
       {
         "hue": "brown",
         "hex": "#6b4423",
-        "weight": 0.0377,
+        "weight": 0.0416,
         "count": 24
       },
       {
         "hue": "white",
         "hex": "#ffffff",
-        "weight": 0.026,
+        "weight": 0.0288,
         "count": 10
       },
       {
         "hue": "navy",
         "hex": "#1b2a4a",
-        "weight": 0.0179,
+        "weight": 0.0174,
         "count": 7
       }
     ],
     "garment_mix": [
       {
         "category": "top",
-        "weight": 0.2066,
-        "count": 503
+        "weight": 0.2138,
+        "count": 505
       },
       {
         "category": "jewelry",
-        "weight": 0.192,
-        "count": 293
+        "weight": 0.1919,
+        "count": 360
       },
       {
         "category": "bottom",
-        "weight": 0.1581,
-        "count": 350
+        "weight": 0.161,
+        "count": 348
       },
       {
         "category": "accessory",
-        "weight": 0.1175,
-        "count": 329
+        "weight": 0.1185,
+        "count": 331
       },
       {
         "category": "shoes",
-        "weight": 0.115,
-        "count": 268
+        "weight": 0.1154,
+        "count": 267
       },
       {
         "category": "bag",
-        "weight": 0.0809,
+        "weight": 0.0763,
         "count": 191
       },
       {
         "category": "dress",
-        "weight": 0.0613,
-        "count": 57
-      },
-      {
-        "category": "swim",
-        "weight": 0.0342,
-        "count": 19
+        "weight": 0.0526,
+        "count": 58
       },
       {
         "category": "outerwear",
-        "weight": 0.0286,
-        "count": 97
+        "weight": 0.0307,
+        "count": 92
+      },
+      {
+        "category": "swim",
+        "weight": 0.0276,
+        "count": 18
       },
       {
         "category": "other",
-        "weight": 0.0058,
-        "count": 7
+        "weight": 0.0121,
+        "count": 9
       }
     ],
     "subcategory_top": [
       {
         "subcategory": "jeans",
-        "weight": 0.0808,
-        "count": 162
+        "weight": 0.0799,
+        "count": 170
       },
       {
         "subcategory": "necklace",
-        "weight": 0.0605,
-        "count": 127
-      },
-      {
-        "subcategory": "earrings",
-        "weight": 0.0497,
-        "count": 27
+        "weight": 0.0578,
+        "count": 132
       },
       {
         "subcategory": "bracelet",
-        "weight": 0.0488,
-        "count": 68
-      },
-      {
-        "subcategory": "sunglasses",
-        "weight": 0.0488,
-        "count": 122
+        "weight": 0.054,
+        "count": 94
       },
       {
         "subcategory": "knit-sweater",
-        "weight": 0.0463,
-        "count": 105
+        "weight": 0.0532,
+        "count": 113
       },
       {
-        "subcategory": "tank",
-        "weight": 0.0391,
-        "count": 65
+        "subcategory": "sunglasses",
+        "weight": 0.0465,
+        "count": 125
       },
       {
-        "subcategory": "shirt",
-        "weight": 0.0343,
-        "count": 88
+        "subcategory": "earrings",
+        "weight": 0.0401,
+        "count": 29
       },
       {
         "subcategory": "t-shirt",
-        "weight": 0.0342,
-        "count": 111
+        "weight": 0.0395,
+        "count": 112
+      },
+      {
+        "subcategory": "tank",
+        "weight": 0.0395,
+        "count": 63
       },
       {
         "subcategory": "sandal",
-        "weight": 0.0317,
+        "weight": 0.0304,
         "count": 44
       },
       {
-        "subcategory": "heel",
-        "weight": 0.0285,
-        "count": 62
+        "subcategory": "shirt",
+        "weight": 0.03,
+        "count": 85
       },
       {
-        "subcategory": "hat",
-        "weight": 0.0253,
-        "count": 30
+        "subcategory": "heel",
+        "weight": 0.026,
+        "count": 63
       },
       {
         "subcategory": "trouser",
-        "weight": 0.0243,
-        "count": 55
+        "weight": 0.023,
+        "count": 46
       },
       {
-        "subcategory": "maxi-dress",
-        "weight": 0.0231,
-        "count": 14
+        "subcategory": "tote",
+        "weight": 0.0227,
+        "count": 66
+      },
+      {
+        "subcategory": "hat",
+        "weight": 0.0211,
+        "count": 30
       },
       {
         "subcategory": "shoulder-bag",
-        "weight": 0.0218,
-        "count": 60
+        "weight": 0.0207,
+        "count": 59
       }
     ],
     "garment_combos_top": {
       "pairs": [
         {
           "combo": "jeans+t-shirt",
-          "weight": 0.0963,
-          "count": 57
+          "weight": 0.1146,
+          "count": 60
         },
         {
           "combo": "jeans+necklace",
-          "weight": 0.0941,
-          "count": 50
-        },
-        {
-          "combo": "jeans+sunglasses",
-          "weight": 0.0891,
-          "count": 53
-        },
-        {
-          "combo": "hat+sunglasses",
-          "weight": 0.085,
-          "count": 17
-        },
-        {
-          "combo": "shirt+sunglasses",
-          "weight": 0.085,
-          "count": 25
-        },
-        {
-          "combo": "necklace+sunglasses",
-          "weight": 0.0822,
-          "count": 28
-        },
-        {
-          "combo": "jeans+tank",
-          "weight": 0.0773,
-          "count": 26
-        },
-        {
-          "combo": "belt+jeans",
-          "weight": 0.0744,
-          "count": 31
-        },
-        {
-          "combo": "bracelet+necklace",
-          "weight": 0.0718,
-          "count": 20
-        },
-        {
-          "combo": "shoulder-bag+sunglasses",
-          "weight": 0.0711,
-          "count": 24
-        },
-        {
-          "combo": "jeans+sandal",
-          "weight": 0.0662,
-          "count": 22
-        },
-        {
-          "combo": "jeans+shoulder-bag",
-          "weight": 0.0643,
-          "count": 26
-        },
-        {
-          "combo": "necklace+shirt",
-          "weight": 0.064,
-          "count": 34
+          "weight": 0.1089,
+          "count": 57
         },
         {
           "combo": "jeans+knit-sweater",
-          "weight": 0.0622,
-          "count": 46
+          "weight": 0.1002,
+          "count": 55
         },
         {
-          "combo": "shorts+sunglasses",
-          "weight": 0.0622,
-          "count": 16
+          "combo": "jeans+sunglasses",
+          "weight": 0.0988,
+          "count": 59
+        },
+        {
+          "combo": "bracelet+jeans",
+          "weight": 0.0903,
+          "count": 38
+        },
+        {
+          "combo": "bracelet+necklace",
+          "weight": 0.0872,
+          "count": 30
+        },
+        {
+          "combo": "necklace+sunglasses",
+          "weight": 0.0752,
+          "count": 31
+        },
+        {
+          "combo": "belt+jeans",
+          "weight": 0.0699,
+          "count": 31
+        },
+        {
+          "combo": "jeans+tank",
+          "weight": 0.0688,
+          "count": 25
+        },
+        {
+          "combo": "hat+sunglasses",
+          "weight": 0.068,
+          "count": 18
+        },
+        {
+          "combo": "shoulder-bag+sunglasses",
+          "weight": 0.0673,
+          "count": 28
+        },
+        {
+          "combo": "jeans+shirt",
+          "weight": 0.067,
+          "count": 40
+        },
+        {
+          "combo": "cardigan+t-shirt",
+          "weight": 0.0662,
+          "count": 39
+        },
+        {
+          "combo": "jeans+sneaker",
+          "weight": 0.0646,
+          "count": 18
+        },
+        {
+          "combo": "shirt+sunglasses",
+          "weight": 0.0646,
+          "count": 25
         }
       ],
       "triples": [
         {
-          "combo": "shirt+shorts+sunglasses",
-          "weight": 0.0517,
-          "count": 5
-        },
-        {
-          "combo": "basket+hat+sunglasses",
-          "weight": 0.0436,
-          "count": 4
+          "combo": "jeans+necklace+t-shirt",
+          "weight": 0.0484,
+          "count": 21
         },
         {
           "combo": "jeans+sneaker+t-shirt",
-          "weight": 0.0412,
+          "weight": 0.0414,
           "count": 11
         },
         {
-          "combo": "jeans+necklace+t-shirt",
-          "weight": 0.0407,
-          "count": 18
+          "combo": "bracelet+jeans+necklace",
+          "weight": 0.04,
+          "count": 14
+        },
+        {
+          "combo": "jeans+sunglasses+t-shirt",
+          "weight": 0.0348,
+          "count": 23
         },
         {
           "combo": "jeans+shoulder-bag+sunglasses",
-          "weight": 0.0396,
-          "count": 11
+          "weight": 0.0345,
+          "count": 13
         },
         {
-          "combo": "hat+shirt+sunglasses",
-          "weight": 0.039,
-          "count": 4
-        },
-        {
-          "combo": "belt+jeans+tank",
-          "weight": 0.038,
-          "count": 7
-        },
-        {
-          "combo": "hat+necklace+sunglasses",
-          "weight": 0.0355,
-          "count": 4
-        },
-        {
-          "combo": "jeans+necklace+sandal",
-          "weight": 0.0354,
-          "count": 11
-        },
-        {
-          "combo": "belt+jeans+sunglasses",
-          "weight": 0.0334,
-          "count": 10
-        },
-        {
-          "combo": "necklace+shirt+sunglasses",
-          "weight": 0.0323,
-          "count": 7
-        },
-        {
-          "combo": "belt+jeans+sandal",
-          "weight": 0.0312,
-          "count": 7
-        },
-        {
-          "combo": "shirt+shoulder-bag+sunglasses",
-          "weight": 0.0298,
-          "count": 6
+          "combo": "cardigan+jeans+t-shirt",
+          "weight": 0.0337,
+          "count": 21
         },
         {
           "combo": "shirt+sunglasses+watch",
-          "weight": 0.0292,
-          "count": 5
+          "weight": 0.032,
+          "count": 8
         },
         {
-          "combo": "necklace+shorts+sunglasses",
-          "weight": 0.0287,
-          "count": 4
+          "combo": "jeans+t-shirt+tote",
+          "weight": 0.0312,
+          "count": 18
+        },
+        {
+          "combo": "bracelet+jeans+knit-sweater",
+          "weight": 0.031,
+          "count": 13
+        },
+        {
+          "combo": "belt+jeans+necklace",
+          "weight": 0.0309,
+          "count": 18
+        },
+        {
+          "combo": "belt+jeans+sunglasses",
+          "weight": 0.0295,
+          "count": 11
+        },
+        {
+          "combo": "blazer+jeans+t-shirt",
+          "weight": 0.0293,
+          "count": 17
+        },
+        {
+          "combo": "jeans+necklace+shirt",
+          "weight": 0.0293,
+          "count": 18
+        },
+        {
+          "combo": "jeans+sunglasses+tote",
+          "weight": 0.0292,
+          "count": 18
+        },
+        {
+          "combo": "belt+jeans+tank",
+          "weight": 0.029,
+          "count": 8
         }
       ]
     },
     "vibe_keywords_top": [
       {
         "keyword": "casual",
-        "weight": 0.0942,
-        "count": 252
+        "weight": 0.1004,
+        "count": 246
       },
       {
         "keyword": "effortless",
-        "weight": 0.087,
-        "count": 110
+        "weight": 0.0833,
+        "count": 127
       },
       {
         "keyword": "chic",
-        "weight": 0.0788,
-        "count": 122
+        "weight": 0.0729,
+        "count": 127
       },
       {
         "keyword": "minimal",
-        "weight": 0.0765,
-        "count": 73
-      },
-      {
-        "keyword": "relaxed",
-        "weight": 0.0454,
-        "count": 71
-      },
-      {
-        "keyword": "boho",
-        "weight": 0.0376,
-        "count": 75
+        "weight": 0.0669,
+        "count": 78
       },
       {
         "keyword": "cozy",
-        "weight": 0.0354,
-        "count": 122
+        "weight": 0.0455,
+        "count": 121
       },
       {
-        "keyword": "summer",
-        "weight": 0.0337,
-        "count": 53
-      },
-      {
-        "keyword": "classic",
-        "weight": 0.0323,
-        "count": 89
-      },
-      {
-        "keyword": "coastal",
-        "weight": 0.032,
-        "count": 29
-      },
-      {
-        "keyword": "resort",
-        "weight": 0.0271,
-        "count": 18
+        "keyword": "relaxed",
+        "weight": 0.0395,
+        "count": 64
       },
       {
         "keyword": "layered",
-        "weight": 0.0261,
-        "count": 163
+        "weight": 0.038,
+        "count": 154
+      },
+      {
+        "keyword": "classic",
+        "weight": 0.0367,
+        "count": 95
+      },
+      {
+        "keyword": "boho",
+        "weight": 0.0338,
+        "count": 73
+      },
+      {
+        "keyword": "summer",
+        "weight": 0.033,
+        "count": 51
+      },
+      {
+        "keyword": "coastal",
+        "weight": 0.0253,
+        "count": 31
       },
       {
         "keyword": "edgy",
-        "weight": 0.0251,
-        "count": 35
+        "weight": 0.0248,
+        "count": 34
       },
       {
-        "keyword": "polished",
-        "weight": 0.0221,
-        "count": 43
-      },
-      {
-        "keyword": "vacation",
-        "weight": 0.02,
-        "count": 11
+        "keyword": "resort",
+        "weight": 0.0213,
+        "count": 16
       },
       {
         "keyword": "glam",
-        "weight": 0.017,
-        "count": 23
+        "weight": 0.0174,
+        "count": 28
+      },
+      {
+        "keyword": "street-style",
+        "weight": 0.0169,
+        "count": 43
+      },
+      {
+        "keyword": "polished",
+        "weight": 0.0164,
+        "count": 41
+      },
+      {
+        "keyword": "preppy",
+        "weight": 0.0164,
+        "count": 100
+      },
+      {
+        "keyword": "streetwear",
+        "weight": 0.0123,
+        "count": 21
+      },
+      {
+        "keyword": "vacation",
+        "weight": 0.0115,
+        "count": 12
       },
       {
         "keyword": "monochrome",
-        "weight": 0.0129,
+        "weight": 0.0113,
         "count": 18
-      },
-      {
-        "keyword": "tailored",
-        "weight": 0.0127,
-        "count": 25
-      },
-      {
-        "keyword": "beach",
-        "weight": 0.0113,
-        "count": 9
-      },
-      {
-        "keyword": "elegant",
-        "weight": 0.0113,
-        "count": 9
       }
     ],
-    "absences": []
+    "absences": [
+      "never pins: tonal / monochrome dressing"
+    ]
   },
   "boards": {
     "my-style": {
-      "pins_used": 425,
-      "weight_total": 48.3635,
+      "pins_used": 427,
+      "weight_total": 80.2087,
       "formula_weights": [
         {
           "formula": "other",
-          "weight": 0.5894,
-          "count": 265
+          "weight": 0.1796,
+          "count": 60
         },
         {
-          "formula": "shorts+shirt+sandal",
-          "weight": 0.0636,
-          "count": 12
+          "formula": "shorts+top+sandal",
+          "weight": 0.0862,
+          "count": 29
+        },
+        {
+          "formula": "dress+necklace+sandal",
+          "weight": 0.0664,
+          "count": 13
         },
         {
           "formula": "athleisure",
-          "weight": 0.0551,
+          "weight": 0.0613,
           "count": 26
         },
         {
-          "formula": "jeans+tee+sneaker",
-          "weight": 0.046,
-          "count": 14
+          "formula": "jeans+tee+sunglasses",
+          "weight": 0.0576,
+          "count": 26
         },
         {
-          "formula": "jeans+shirt+flat",
-          "weight": 0.0375,
+          "formula": "jeans+blazer+tee",
+          "weight": 0.0544,
+          "count": 28
+        },
+        {
+          "formula": "jeans+knit",
+          "weight": 0.054,
           "count": 17
         },
         {
-          "formula": "jeans+knit+boot",
-          "weight": 0.0329,
-          "count": 31
+          "formula": "jeans+shirt+belt",
+          "weight": 0.0513,
+          "count": 16
         },
         {
-          "formula": "swimsuit-only",
-          "weight": 0.0327,
-          "count": 5
+          "formula": "jeans+tee",
+          "weight": 0.04,
+          "count": 9
         },
         {
-          "formula": "jeans+blazer+heel",
-          "weight": 0.0291,
-          "count": 12
+          "formula": "skirt+top+heel",
+          "weight": 0.0376,
+          "count": 24
         },
         {
-          "formula": "swimsuit+cover-up+sandal",
-          "weight": 0.0285,
-          "count": 2
-        },
-        {
-          "formula": "matching-set",
-          "weight": 0.0274,
-          "count": 6
-        },
-        {
-          "formula": "tonal-monochrome",
-          "weight": 0.0233,
-          "count": 7
-        },
-        {
-          "formula": "midi-skirt+fitted-top",
-          "weight": 0.0169,
-          "count": 8
-        },
-        {
-          "formula": "tailored-trouser+shirt+heel",
-          "weight": 0.0121,
-          "count": 5
-        },
-        {
-          "formula": "midi-dress+boot",
-          "weight": 0.0023,
-          "count": 5
-        },
-        {
-          "formula": "cardigan+skirt+flat",
-          "weight": 0.0018,
-          "count": 5
+          "formula": "jeans+cardigan+tee",
+          "weight": 0.0369,
+          "count": 27
         },
         {
           "formula": "knit+trouser+loafer",
-          "weight": 0.0009,
+          "weight": 0.0319,
+          "count": 14
+        },
+        {
+          "formula": "jeans+knit+necklace",
+          "weight": 0.0303,
+          "count": 9
+        },
+        {
+          "formula": "jeans+knit+scarf",
+          "weight": 0.0303,
+          "count": 19
+        },
+        {
+          "formula": "swim+cover-up",
+          "weight": 0.029,
+          "count": 5
+        },
+        {
+          "formula": "trouser+shirt+heel",
+          "weight": 0.0276,
+          "count": 11
+        },
+        {
+          "formula": "jeans+knit+shirt",
+          "weight": 0.0252,
+          "count": 28
+        },
+        {
+          "formula": "leggings+knit+boot",
+          "weight": 0.0245,
+          "count": 17
+        },
+        {
+          "formula": "skirt+knit+boot",
+          "weight": 0.0196,
+          "count": 15
+        },
+        {
+          "formula": "jeans+tee+sneaker",
+          "weight": 0.0132,
           "count": 3
         },
         {
-          "formula": "mini-skirt+jacket+boot",
-          "weight": 0.0004,
-          "count": 1
+          "formula": "dress+cardigan",
+          "weight": 0.0125,
+          "count": 13
         },
         {
-          "formula": "shirt-dress+flat",
-          "weight": 0.0001,
+          "formula": "dress+boot",
+          "weight": 0.0122,
+          "count": 11
+        },
+        {
+          "formula": "blazer+wide-leg-trouser+loafer",
+          "weight": 0.0089,
+          "count": 3
+        },
+        {
+          "formula": "midi-skirt+fitted-top",
+          "weight": 0.0083,
+          "count": 3
+        },
+        {
+          "formula": "tailored-trouser+shirt+heel",
+          "weight": 0.0011,
           "count": 1
         }
       ],
       "formula_weights_v2": [
         {
-          "formula": "other",
-          "weight": 0.1637,
-          "count": 53
-        },
-        {
           "formula": "dress+necklace+sandal",
-          "weight": 0.1377,
+          "weight": 0.1094,
           "count": 24
         },
         {
           "formula": "shorts+top+sandal",
-          "weight": 0.0934,
+          "weight": 0.0868,
           "count": 30
         },
         {
           "formula": "athleisure",
-          "weight": 0.0744,
+          "weight": 0.0815,
           "count": 36
         },
         {
-          "formula": "jeans+shirt+belt",
-          "weight": 0.0683,
-          "count": 19
-        },
-        {
-          "formula": "knit+trouser+loafer",
-          "weight": 0.0637,
-          "count": 27
-        },
-        {
           "formula": "jeans+tee+sunglasses",
-          "weight": 0.0609,
+          "weight": 0.0735,
+          "count": 28
+        },
+        {
+          "formula": "other",
+          "weight": 0.0588,
           "count": 22
         },
         {
-          "formula": "swim+cover-up",
-          "weight": 0.0597,
-          "count": 6
-        },
-        {
-          "formula": "skirt+top+heel",
-          "weight": 0.0487,
-          "count": 25
+          "formula": "jeans+shirt+belt",
+          "weight": 0.0539,
+          "count": 19
         },
         {
           "formula": "jeans+blazer+tee",
-          "weight": 0.047,
+          "weight": 0.0534,
           "count": 25
         },
         {
-          "formula": "trouser+shirt+heel",
-          "weight": 0.0396,
-          "count": 16
+          "formula": "skirt+top+heel",
+          "weight": 0.0488,
+          "count": 24
         },
         {
-          "formula": "jeans+cardigan+tee",
-          "weight": 0.0296,
-          "count": 23
+          "formula": "knit+trouser+loafer",
+          "weight": 0.0474,
+          "count": 18
+        },
+        {
+          "formula": "trouser+shirt+heel",
+          "weight": 0.046,
+          "count": 18
+        },
+        {
+          "formula": "swim+cover-up",
+          "weight": 0.0415,
+          "count": 6
         },
         {
           "formula": "jeans+knit+necklace",
-          "weight": 0.026,
+          "weight": 0.0402,
+          "count": 18
+        },
+        {
+          "formula": "jeans+knit",
+          "weight": 0.0399,
           "count": 13
         },
         {
+          "formula": "jeans+tee",
+          "weight": 0.0383,
+          "count": 10
+        },
+        {
+          "formula": "jeans+cardigan+tee",
+          "weight": 0.0366,
+          "count": 24
+        },
+        {
           "formula": "leggings+knit+boot",
-          "weight": 0.0177,
+          "weight": 0.0245,
           "count": 17
         },
         {
+          "formula": "jeans+knit+scarf",
+          "weight": 0.0217,
+          "count": 14
+        },
+        {
+          "formula": "jeans+knit+shirt",
+          "weight": 0.0212,
+          "count": 24
+        },
+        {
           "formula": "dress+boot",
-          "weight": 0.0176,
+          "weight": 0.0206,
+          "count": 12
+        },
+        {
+          "formula": "skirt+knit+boot",
+          "weight": 0.0172,
           "count": 12
         },
         {
           "formula": "blazer+wide-leg-trouser+loafer",
-          "weight": 0.0161,
-          "count": 8
-        },
-        {
-          "formula": "skirt+knit+boot",
-          "weight": 0.0121,
-          "count": 13
-        },
-        {
-          "formula": "jeans+knit+shirt",
-          "weight": 0.0077,
-          "count": 18
+          "weight": 0.0164,
+          "count": 7
         },
         {
           "formula": "dress+cardigan",
-          "weight": 0.0056,
-          "count": 12
-        },
-        {
-          "formula": "jeans+knit+scarf",
-          "weight": 0.0049,
-          "count": 10
+          "weight": 0.0125,
+          "count": 13
         },
         {
           "formula": "midi-skirt+fitted-top",
-          "weight": 0.0036,
-          "count": 11
-        },
-        {
-          "formula": "knit+shirt+necklace",
-          "weight": 0.0021,
-          "count": 5
+          "weight": 0.0102,
+          "count": 13
         }
       ],
-      "formula_v2_coverage": 0.8363,
+      "formula_v2_coverage": 0.9412,
       "silhouettes": [
         {
           "silhouette": "relaxed",
-          "weight": 0.3239,
-          "count": 78
+          "weight": 0.3079,
+          "count": 87
         },
         {
           "silhouette": "layered",
-          "weight": 0.1694,
-          "count": 153
-        },
-        {
-          "silhouette": "volume-top-slim-bottom",
-          "weight": 0.1319,
-          "count": 55
+          "weight": 0.1726,
+          "count": 135
         },
         {
           "silhouette": "fitted",
-          "weight": 0.1237,
-          "count": 61
+          "weight": 0.1651,
+          "count": 71
+        },
+        {
+          "silhouette": "volume-top-slim-bottom",
+          "weight": 0.1411,
+          "count": 60
         },
         {
           "silhouette": "straight",
-          "weight": 0.0687,
-          "count": 20
+          "weight": 0.0593,
+          "count": 22
+        },
+        {
+          "silhouette": "fit-and-flare",
+          "weight": 0.0454,
+          "count": 11
         },
         {
           "silhouette": "a-line",
-          "weight": 0.0562,
+          "weight": 0.0328,
           "count": 17
         },
         {
           "silhouette": "slim-top-wide-bottom",
-          "weight": 0.0406,
-          "count": 10
-        },
-        {
-          "silhouette": "other",
-          "weight": 0.0342,
-          "count": 5
-        },
-        {
-          "silhouette": "fit-and-flare",
-          "weight": 0.0253,
-          "count": 9
+          "weight": 0.03,
+          "count": 7
         },
         {
           "silhouette": "column",
-          "weight": 0.0248,
-          "count": 15
+          "weight": 0.0262,
+          "count": 13
         },
         {
-          "silhouette": "oversized",
-          "weight": 0.0014,
-          "count": 2
+          "silhouette": "other",
+          "weight": 0.0197,
+          "count": 4
         }
       ],
       "formality_histogram": {
         "1": {
-          "weight": 0.096,
-          "count": 30
+          "weight": 0.1064,
+          "count": 35
         },
         "2": {
-          "weight": 0.5049,
-          "count": 221
+          "weight": 0.5044,
+          "count": 222
         },
         "3": {
-          "weight": 0.2424,
-          "count": 134
+          "weight": 0.2463,
+          "count": 130
         },
         "4": {
-          "weight": 0.131,
+          "weight": 0.1196,
           "count": 32
         },
         "5": {
-          "weight": 0.0256,
+          "weight": 0.0234,
           "count": 8
         }
       },
-      "formality_mean": 2.4854,
+      "formality_mean": 2.4493,
       "seasons": [
         {
           "season": "summer",
-          "weight": 0.3822,
-          "count": 98
+          "weight": 0.3309,
+          "count": 97
         },
         {
           "season": "autumn",
-          "weight": 0.2467,
-          "count": 178
-        },
-        {
-          "season": "all-season",
-          "weight": 0.1656,
-          "count": 41
+          "weight": 0.3271,
+          "count": 180
         },
         {
           "season": "spring",
-          "weight": 0.1573,
-          "count": 92
+          "weight": 0.1538,
+          "count": 89
+        },
+        {
+          "season": "all-season",
+          "weight": 0.1365,
+          "count": 37
         },
         {
           "season": "winter",
-          "weight": 0.0481,
-          "count": 16
+          "weight": 0.0517,
+          "count": 24
         }
       ],
       "occasions": [
         {
           "occasion": "everyday",
-          "weight": 0.3816,
-          "count": 192
+          "weight": 0.4266,
+          "count": 205
         },
         {
           "occasion": "vacation",
-          "weight": 0.1328,
-          "count": 22
+          "weight": 0.1118,
+          "count": 21
         },
         {
           "occasion": "weekend",
-          "weight": 0.1138,
-          "count": 57
-        },
-        {
-          "occasion": "party",
-          "weight": 0.0917,
-          "count": 18
-        },
-        {
-          "occasion": "travel",
-          "weight": 0.0458,
-          "count": 13
-        },
-        {
-          "occasion": "evening",
-          "weight": 0.0401,
-          "count": 9
+          "weight": 0.1029,
+          "count": 48
         },
         {
           "occasion": "work",
-          "weight": 0.0351,
-          "count": 51
+          "weight": 0.0685,
+          "count": 54
         },
         {
-          "occasion": "date-night",
-          "weight": 0.0341,
-          "count": 12
-        },
-        {
-          "occasion": "beach",
-          "weight": 0.0324,
-          "count": 6
-        },
-        {
-          "occasion": "errands",
-          "weight": 0.0322,
+          "occasion": "party",
+          "weight": 0.0636,
           "count": 16
         },
         {
+          "occasion": "evening",
+          "weight": 0.0385,
+          "count": 10
+        },
+        {
+          "occasion": "travel",
+          "weight": 0.0379,
+          "count": 13
+        },
+        {
+          "occasion": "date-night",
+          "weight": 0.0324,
+          "count": 11
+        },
+        {
+          "occasion": "errands",
+          "weight": 0.0297,
+          "count": 14
+        },
+        {
+          "occasion": "beach",
+          "weight": 0.0274,
+          "count": 7
+        },
+        {
+          "occasion": "gym",
+          "weight": 0.0222,
+          "count": 13
+        },
+        {
           "occasion": "wedding-guest",
-          "weight": 0.027,
+          "weight": 0.0189,
           "count": 3
         },
         {
           "occasion": "brunch",
-          "weight": 0.0177,
-          "count": 13
+          "weight": 0.0166,
+          "count": 11
         },
         {
-          "occasion": "gym",
-          "weight": 0.0156,
-          "count": 13
+          "occasion": "other",
+          "weight": 0.003,
+          "count": 1
         }
       ],
       "palette": {
         "neutrals": [
           {
             "colour": "black",
-            "weight": 0.2283,
-            "count": 453
+            "weight": 0.2154,
+            "count": 451
           },
           {
             "colour": "white",
-            "weight": 0.1268,
-            "count": 231
-          },
-          {
-            "colour": "brown",
-            "weight": 0.0525,
-            "count": 158
+            "weight": 0.1263,
+            "count": 240
           },
           {
             "colour": "grey",
-            "weight": 0.0523,
-            "count": 188
+            "weight": 0.0664,
+            "count": 196
           },
           {
-            "colour": "cream",
-            "weight": 0.0491,
-            "count": 66
+            "colour": "brown",
+            "weight": 0.0523,
+            "count": 157
           },
           {
             "colour": "beige",
-            "weight": 0.0434,
-            "count": 102
+            "weight": 0.0494,
+            "count": 101
+          },
+          {
+            "colour": "cream",
+            "weight": 0.0465,
+            "count": 69
           },
           {
             "colour": "denim",
-            "weight": 0.0391,
+            "weight": 0.0405,
             "count": 78
           },
           {
             "colour": "tan",
-            "weight": 0.0342,
-            "count": 82
+            "weight": 0.0311,
+            "count": 84
           },
           {
             "colour": "navy",
-            "weight": 0.023,
-            "count": 45
+            "weight": 0.0222,
+            "count": 43
           },
           {
             "colour": "charcoal",
-            "weight": 0.0208,
-            "count": 34
+            "weight": 0.0132,
+            "count": 26
           },
           {
             "colour": "camel",
-            "weight": 0.0012,
-            "count": 16
+            "weight": 0.0032,
+            "count": 14
           }
         ],
         "secondary": [
           {
             "colour": "gold",
-            "weight": 0.1009,
-            "count": 181
+            "weight": 0.1066,
+            "count": 217
           },
           {
             "colour": "silver",
-            "weight": 0.07,
-            "count": 74
+            "weight": 0.062,
+            "count": 85
           }
         ],
         "accent": [
           {
-            "colour": "blue",
-            "weight": 0.0423,
-            "count": 73
+            "colour": "multi",
+            "weight": 0.0417,
+            "count": 103
           },
           {
-            "colour": "multi",
-            "weight": 0.0297,
-            "count": 94
+            "colour": "blue",
+            "weight": 0.0383,
+            "count": 74
+          },
+          {
+            "colour": "light-blue",
+            "weight": 0.0225,
+            "count": 47
           }
         ],
-        "neutral_share": 0.6707,
-        "secondary_share": 0.1709,
-        "accent_share": 0.072
+        "neutral_share": 0.6665,
+        "secondary_share": 0.1686,
+        "accent_share": 0.1025
       },
       "dominant_colors": [
         {
           "hue": "grey",
           "hex": "#808080",
-          "weight": 0.3752,
+          "weight": 0.3658,
           "count": 137
         },
         {
           "hue": "beige",
           "hex": "#d2b48c",
-          "weight": 0.1896,
-          "count": 78
+          "weight": 0.1957,
+          "count": 79
         },
         {
           "hue": "cream",
           "hex": "#f5ecd7",
-          "weight": 0.18,
+          "weight": 0.1688,
           "count": 51
         },
         {
           "hue": "pink",
           "hex": "#e39ab6",
-          "weight": 0.0836,
-          "count": 28
+          "weight": 0.0866,
+          "count": 29
         },
         {
           "hue": "olive",
           "hex": "#6b6b2a",
-          "weight": 0.0605,
+          "weight": 0.0687,
           "count": 34
         },
         {
           "hue": "brown",
           "hex": "#6b4423",
-          "weight": 0.0401,
+          "weight": 0.0437,
           "count": 24
         },
         {
           "hue": "white",
           "hex": "#ffffff",
-          "weight": 0.0276,
+          "weight": 0.0303,
           "count": 10
         },
         {
           "hue": "navy",
           "hex": "#1b2a4a",
-          "weight": 0.019,
+          "weight": 0.0183,
           "count": 7
         }
       ],
       "garment_mix": [
         {
           "category": "top",
-          "weight": 0.2115,
-          "count": 499
+          "weight": 0.2204,
+          "count": 502
         },
         {
           "category": "jewelry",
           "weight": 0.1941,
-          "count": 288
+          "count": 355
         },
         {
           "category": "bottom",
-          "weight": 0.1646,
-          "count": 348
+          "weight": 0.1663,
+          "count": 346
         },
         {
           "category": "shoes",
-          "weight": 0.1192,
-          "count": 266
+          "weight": 0.1188,
+          "count": 265
         },
         {
           "category": "accessory",
-          "weight": 0.1079,
-          "count": 320
+          "weight": 0.1114,
+          "count": 322
         },
         {
           "category": "bag",
-          "weight": 0.0782,
+          "weight": 0.0739,
           "count": 186
         },
         {
           "category": "dress",
-          "weight": 0.0636,
-          "count": 56
+          "weight": 0.054,
+          "count": 57
         },
         {
           "category": "outerwear",
-          "weight": 0.0304,
-          "count": 97
+          "weight": 0.0322,
+          "count": 92
         },
         {
           "category": "swim",
-          "weight": 0.0245,
-          "count": 13
+          "weight": 0.016,
+          "count": 10
         },
         {
           "category": "other",
-          "weight": 0.0062,
-          "count": 7
+          "weight": 0.0128,
+          "count": 9
         }
       ],
       "subcategory_top": [
         {
           "subcategory": "jeans",
-          "weight": 0.0858,
-          "count": 162
+          "weight": 0.0839,
+          "count": 170
         },
         {
           "subcategory": "necklace",
-          "weight": 0.0621,
-          "count": 126
-        },
-        {
-          "subcategory": "earrings",
-          "weight": 0.0499,
-          "count": 26
+          "weight": 0.0589,
+          "count": 131
         },
         {
           "subcategory": "knit-sweater",
-          "weight": 0.0492,
-          "count": 105
+          "weight": 0.0559,
+          "count": 113
         },
         {
           "subcategory": "bracelet",
-          "weight": 0.0486,
-          "count": 66
+          "weight": 0.0541,
+          "count": 92
         },
         {
           "subcategory": "sunglasses",
-          "weight": 0.0467,
-          "count": 119
+          "weight": 0.0447,
+          "count": 122
         },
         {
           "subcategory": "tank",
-          "weight": 0.0415,
-          "count": 65
+          "weight": 0.0414,
+          "count": 63
+        },
+        {
+          "subcategory": "earrings",
+          "weight": 0.0403,
+          "count": 28
         },
         {
           "subcategory": "t-shirt",
-          "weight": 0.0346,
-          "count": 110
+          "weight": 0.04,
+          "count": 111
         },
         {
           "subcategory": "shirt",
-          "weight": 0.0335,
-          "count": 87
+          "weight": 0.0315,
+          "count": 85
         },
         {
           "subcategory": "sandal",
-          "weight": 0.0307,
+          "weight": 0.0295,
           "count": 42
         },
         {
           "subcategory": "heel",
-          "weight": 0.0303,
-          "count": 62
+          "weight": 0.0273,
+          "count": 63
         },
         {
           "subcategory": "trouser",
-          "weight": 0.0258,
-          "count": 55
+          "weight": 0.0241,
+          "count": 46
+        },
+        {
+          "subcategory": "cardigan",
+          "weight": 0.0217,
+          "count": 79
         },
         {
           "subcategory": "shoulder-bag",
-          "weight": 0.0232,
-          "count": 60
-        },
-        {
-          "subcategory": "maxi-dress",
-          "weight": 0.023,
-          "count": 13
+          "weight": 0.0217,
+          "count": 59
         },
         {
           "subcategory": "sneaker",
-          "weight": 0.0227,
-          "count": 35
+          "weight": 0.0217,
+          "count": 34
         }
       ],
       "garment_combos_top": {
         "pairs": [
           {
             "combo": "jeans+t-shirt",
-            "weight": 0.1023,
-            "count": 57
+            "weight": 0.1203,
+            "count": 60
           },
           {
             "combo": "jeans+necklace",
-            "weight": 0.0999,
-            "count": 50
+            "weight": 0.1143,
+            "count": 57
+          },
+          {
+            "combo": "jeans+knit-sweater",
+            "weight": 0.1052,
+            "count": 55
           },
           {
             "combo": "jeans+sunglasses",
-            "weight": 0.0947,
-            "count": 53
+            "weight": 0.1037,
+            "count": 59
           },
           {
-            "combo": "shirt+sunglasses",
-            "weight": 0.0903,
-            "count": 25
+            "combo": "bracelet+jeans",
+            "weight": 0.0948,
+            "count": 38
+          },
+          {
+            "combo": "bracelet+necklace",
+            "weight": 0.0915,
+            "count": 30
           },
           {
             "combo": "necklace+sunglasses",
-            "weight": 0.0873,
-            "count": 28
-          },
-          {
-            "combo": "jeans+tank",
-            "weight": 0.0821,
-            "count": 26
-          },
-          {
-            "combo": "belt+jeans",
             "weight": 0.079,
             "count": 31
           },
           {
-            "combo": "bracelet+necklace",
-            "weight": 0.0762,
-            "count": 20
+            "combo": "belt+jeans",
+            "weight": 0.0734,
+            "count": 31
+          },
+          {
+            "combo": "jeans+tank",
+            "weight": 0.0722,
+            "count": 25
           },
           {
             "combo": "shoulder-bag+sunglasses",
-            "weight": 0.0755,
-            "count": 24
-          },
-          {
-            "combo": "jeans+sandal",
-            "weight": 0.0703,
-            "count": 22
-          },
-          {
-            "combo": "jeans+shoulder-bag",
-            "weight": 0.0683,
-            "count": 26
-          },
-          {
-            "combo": "necklace+shirt",
-            "weight": 0.0679,
-            "count": 34
-          },
-          {
-            "combo": "jeans+knit-sweater",
-            "weight": 0.0661,
-            "count": 46
-          },
-          {
-            "combo": "shorts+sunglasses",
-            "weight": 0.0661,
-            "count": 16
+            "weight": 0.0706,
+            "count": 28
           },
           {
             "combo": "jeans+shirt",
-            "weight": 0.0638,
-            "count": 38
+            "weight": 0.0703,
+            "count": 40
+          },
+          {
+            "combo": "cardigan+t-shirt",
+            "weight": 0.0695,
+            "count": 39
+          },
+          {
+            "combo": "jeans+sneaker",
+            "weight": 0.0678,
+            "count": 18
+          },
+          {
+            "combo": "shirt+sunglasses",
+            "weight": 0.0678,
+            "count": 25
+          },
+          {
+            "combo": "jeans+shoulder-bag",
+            "weight": 0.0667,
+            "count": 27
           }
         ],
         "triples": [
           {
-            "combo": "shirt+shorts+sunglasses",
-            "weight": 0.0549,
-            "count": 5
+            "combo": "jeans+necklace+t-shirt",
+            "weight": 0.0508,
+            "count": 21
           },
           {
             "combo": "jeans+sneaker+t-shirt",
-            "weight": 0.0438,
+            "weight": 0.0434,
             "count": 11
           },
           {
-            "combo": "jeans+necklace+t-shirt",
-            "weight": 0.0433,
-            "count": 18
+            "combo": "bracelet+jeans+necklace",
+            "weight": 0.042,
+            "count": 14
+          },
+          {
+            "combo": "jeans+sunglasses+t-shirt",
+            "weight": 0.0365,
+            "count": 23
           },
           {
             "combo": "jeans+shoulder-bag+sunglasses",
-            "weight": 0.042,
-            "count": 11
+            "weight": 0.0362,
+            "count": 13
           },
           {
-            "combo": "hat+shirt+sunglasses",
-            "weight": 0.0414,
-            "count": 4
-          },
-          {
-            "combo": "belt+jeans+tank",
-            "weight": 0.0403,
-            "count": 7
-          },
-          {
-            "combo": "hat+necklace+sunglasses",
-            "weight": 0.0377,
-            "count": 4
-          },
-          {
-            "combo": "jeans+necklace+sandal",
-            "weight": 0.0376,
-            "count": 11
-          },
-          {
-            "combo": "belt+jeans+sunglasses",
-            "weight": 0.0355,
-            "count": 10
-          },
-          {
-            "combo": "necklace+shirt+sunglasses",
-            "weight": 0.0343,
-            "count": 7
-          },
-          {
-            "combo": "belt+jeans+sandal",
-            "weight": 0.0332,
-            "count": 7
-          },
-          {
-            "combo": "shirt+shoulder-bag+sunglasses",
-            "weight": 0.0316,
-            "count": 6
+            "combo": "cardigan+jeans+t-shirt",
+            "weight": 0.0354,
+            "count": 21
           },
           {
             "combo": "shirt+sunglasses+watch",
+            "weight": 0.0336,
+            "count": 8
+          },
+          {
+            "combo": "jeans+t-shirt+tote",
+            "weight": 0.0327,
+            "count": 18
+          },
+          {
+            "combo": "belt+jeans+necklace",
+            "weight": 0.0325,
+            "count": 18
+          },
+          {
+            "combo": "bracelet+jeans+knit-sweater",
+            "weight": 0.0325,
+            "count": 13
+          },
+          {
+            "combo": "belt+jeans+sunglasses",
             "weight": 0.031,
-            "count": 5
+            "count": 11
           },
           {
-            "combo": "knit-sweater+sneaker+trouser",
-            "weight": 0.0304,
-            "count": 5
+            "combo": "blazer+jeans+t-shirt",
+            "weight": 0.0307,
+            "count": 17
           },
           {
-            "combo": "necklace+shorts+sunglasses",
+            "combo": "jeans+necklace+shirt",
+            "weight": 0.0307,
+            "count": 18
+          },
+          {
+            "combo": "jeans+sunglasses+tote",
+            "weight": 0.0306,
+            "count": 18
+          },
+          {
+            "combo": "belt+jeans+tank",
             "weight": 0.0304,
-            "count": 4
+            "count": 8
           }
         ]
       },
       "vibe_keywords_top": [
         {
           "keyword": "casual",
-          "weight": 0.0968,
-          "count": 250
+          "weight": 0.1028,
+          "count": 244
         },
         {
           "keyword": "effortless",
-          "weight": 0.0909,
-          "count": 109
+          "weight": 0.0849,
+          "count": 125
         },
         {
           "keyword": "chic",
-          "weight": 0.0804,
-          "count": 120
+          "weight": 0.0725,
+          "count": 124
         },
         {
           "keyword": "minimal",
-          "weight": 0.0778,
-          "count": 71
-        },
-        {
-          "keyword": "relaxed",
-          "weight": 0.0448,
-          "count": 69
+          "weight": 0.069,
+          "count": 77
         },
         {
           "keyword": "cozy",
-          "weight": 0.0377,
-          "count": 122
-        },
-        {
-          "keyword": "classic",
-          "weight": 0.0344,
-          "count": 89
-        },
-        {
-          "keyword": "summer",
-          "weight": 0.0323,
-          "count": 51
-        },
-        {
-          "keyword": "boho",
-          "weight": 0.0309,
-          "count": 70
+          "weight": 0.0479,
+          "count": 121
         },
         {
           "keyword": "layered",
-          "weight": 0.0278,
-          "count": 163
+          "weight": 0.0401,
+          "count": 154
+        },
+        {
+          "keyword": "classic",
+          "weight": 0.0386,
+          "count": 95
+        },
+        {
+          "keyword": "relaxed",
+          "weight": 0.0359,
+          "count": 60
+        },
+        {
+          "keyword": "summer",
+          "weight": 0.0318,
+          "count": 49
+        },
+        {
+          "keyword": "boho",
+          "weight": 0.0299,
+          "count": 69
         },
         {
           "keyword": "edgy",
-          "weight": 0.0268,
-          "count": 35
-        },
-        {
-          "keyword": "polished",
-          "weight": 0.0236,
-          "count": 43
+          "weight": 0.0261,
+          "count": 34
         },
         {
           "keyword": "coastal",
-          "weight": 0.0214,
-          "count": 22
-        },
-        {
-          "keyword": "resort",
-          "weight": 0.0199,
-          "count": 13
+          "weight": 0.0195,
+          "count": 26
         },
         {
           "keyword": "glam",
-          "weight": 0.0182,
-          "count": 23
+          "weight": 0.0183,
+          "count": 28
         },
         {
-          "keyword": "vacation",
-          "weight": 0.0159,
-          "count": 8
+          "keyword": "street-style",
+          "weight": 0.0178,
+          "count": 43
+        },
+        {
+          "keyword": "preppy",
+          "weight": 0.0173,
+          "count": 100
+        },
+        {
+          "keyword": "polished",
+          "weight": 0.0172,
+          "count": 41
+        },
+        {
+          "keyword": "resort",
+          "weight": 0.0153,
+          "count": 11
+        },
+        {
+          "keyword": "streetwear",
+          "weight": 0.013,
+          "count": 21
         },
         {
           "keyword": "monochrome",
-          "weight": 0.0137,
+          "weight": 0.0119,
           "count": 18
         },
         {
-          "keyword": "tailored",
-          "weight": 0.0136,
-          "count": 25
-        },
-        {
-          "keyword": "elegant",
-          "weight": 0.0121,
-          "count": 9
-        },
-        {
-          "keyword": "sporty",
-          "weight": 0.01,
-          "count": 22
+          "keyword": "smart-casual",
+          "weight": 0.0118,
+          "count": 62
         }
       ],
-      "absences": []
+      "absences": [
+        "never pins: tonal / monochrome dressing"
+      ]
     },
     "swim-look": {
       "pins_used": 7,
-      "weight_total": 3.0064,
+      "weight_total": 3.9847,
       "formula_weights": [
         {
-          "formula": "other",
-          "weight": 0.43,
-          "count": 3
+          "formula": "swim+cover-up",
+          "weight": 0.5694,
+          "count": 4
         },
         {
-          "formula": "swimsuit+cover-up+sandal",
-          "weight": 0.4263,
-          "count": 3
+          "formula": "shorts+top+sandal",
+          "weight": 0.2869,
+          "count": 2
         },
         {
-          "formula": "shorts+shirt+sandal",
+          "formula": "dress+necklace+sandal",
           "weight": 0.1437,
           "count": 1
         }
@@ -1857,50 +1956,45 @@
       "formula_weights_v2": [
         {
           "formula": "swim+cover-up",
-          "weight": 0.4263,
-          "count": 3
+          "weight": 0.5694,
+          "count": 4
         },
         {
           "formula": "shorts+top+sandal",
-          "weight": 0.2876,
+          "weight": 0.2869,
           "count": 2
         },
         {
           "formula": "dress+necklace+sandal",
-          "weight": 0.1441,
-          "count": 1
-        },
-        {
-          "formula": "other",
-          "weight": 0.1421,
+          "weight": 0.1437,
           "count": 1
         }
       ],
-      "formula_v2_coverage": 0.8579,
+      "formula_v2_coverage": 1,
       "silhouettes": [
         {
           "silhouette": "relaxed",
-          "weight": 0.7122,
+          "weight": 0.7129,
           "count": 5
         },
         {
           "silhouette": "column",
-          "weight": 0.1441,
+          "weight": 0.1437,
           "count": 1
         },
         {
           "silhouette": "volume-top-slim-bottom",
-          "weight": 0.1437,
+          "weight": 0.1434,
           "count": 1
         }
       ],
       "formality_histogram": {
         "1": {
-          "weight": 0.8559,
+          "weight": 0.8563,
           "count": 6
         },
         "2": {
-          "weight": 0.1441,
+          "weight": 0.1437,
           "count": 1
         },
         "3": {
@@ -1916,7 +2010,7 @@
           "count": 0
         }
       },
-      "formality_mean": 1.1441,
+      "formality_mean": 1.1437,
       "seasons": [
         {
           "season": "summer",
@@ -1927,40 +2021,40 @@
       "occasions": [
         {
           "occasion": "beach",
-          "weight": 0.7138,
+          "weight": 0.714,
           "count": 5
         },
         {
           "occasion": "vacation",
-          "weight": 0.2862,
+          "weight": 0.286,
           "count": 2
         }
       ],
       "palette": {
         "neutrals": [
           {
-            "colour": "beige",
-            "weight": 0.1238,
+            "colour": "white",
+            "weight": 0.1544,
             "count": 5
           },
           {
-            "colour": "cream",
-            "weight": 0.1171,
-            "count": 4
-          },
-          {
             "colour": "black",
-            "weight": 0.1076,
-            "count": 4
+            "weight": 0.143,
+            "count": 5
           },
           {
-            "colour": "white",
-            "weight": 0.095,
-            "count": 3
+            "colour": "beige",
+            "weight": 0.0953,
+            "count": 4
           },
           {
             "colour": "tan",
-            "weight": 0.0835,
+            "weight": 0.0832,
+            "count": 3
+          },
+          {
+            "colour": "cream",
+            "weight": 0.0814,
             "count": 3
           },
           {
@@ -1970,68 +2064,68 @@
           },
           {
             "colour": "denim",
-            "weight": 0.0355,
+            "weight": 0.0356,
             "count": 1
           },
           {
             "colour": "navy",
-            "weight": 0.0355,
+            "weight": 0.0356,
             "count": 1
           }
         ],
         "secondary": [
           {
-            "colour": "gold",
-            "weight": 0.1066,
-            "count": 3
+            "colour": "multi",
+            "weight": 0.0595,
+            "count": 2
           },
           {
-            "colour": "multi",
-            "weight": 0.0714,
+            "colour": "gold",
+            "weight": 0.0593,
             "count": 2
           }
         ],
         "accent": [
           {
+            "colour": "sage",
+            "weight": 0.0574,
+            "count": 2
+          },
+          {
             "colour": "purple",
-            "weight": 0.0355,
+            "weight": 0.0356,
             "count": 1
           },
           {
             "colour": "teal",
-            "weight": 0.0355,
-            "count": 1
-          },
-          {
-            "colour": "sage",
-            "weight": 0.0288,
+            "weight": 0.0356,
             "count": 1
           },
           {
             "colour": "silver",
-            "weight": 0.0288,
+            "weight": 0.0287,
             "count": 1
           },
           {
             "colour": "light-blue",
-            "weight": 0.024,
+            "weight": 0.0239,
             "count": 1
           },
           {
             "colour": "yellow",
-            "weight": 0.024,
+            "weight": 0.0239,
             "count": 1
           }
         ],
-        "neutral_share": 0.6456,
-        "secondary_share": 0.178,
-        "accent_share": 0.1766
+        "neutral_share": 0.6761,
+        "secondary_share": 0.1188,
+        "accent_share": 0.2051
       },
       "dominant_colors": [
         {
           "hue": "grey",
           "hex": "#808080",
-          "weight": 0.2862,
+          "weight": 0.286,
           "count": 2
         },
         {
@@ -2043,55 +2137,55 @@
         {
           "hue": "cream",
           "hex": "#f5ecd7",
-          "weight": 0.2842,
+          "weight": 0.2847,
           "count": 2
         },
         {
           "hue": "pink",
           "hex": "#e39ab6",
-          "weight": 0.1437,
+          "weight": 0.1434,
           "count": 1
         }
       ],
       "garment_mix": [
         {
           "category": "accessory",
-          "weight": 0.2733,
+          "weight": 0.2616,
           "count": 9
         },
         {
           "category": "swim",
-          "weight": 0.1894,
-          "count": 6
+          "weight": 0.261,
+          "count": 8
         },
         {
           "category": "jewelry",
-          "weight": 0.1593,
+          "weight": 0.1475,
+          "count": 5
+        },
+        {
+          "category": "bag",
+          "weight": 0.1242,
           "count": 5
         },
         {
           "category": "top",
-          "weight": 0.1289,
-          "count": 4
-        },
-        {
-          "category": "bag",
-          "weight": 0.1244,
-          "count": 5
+          "weight": 0.0813,
+          "count": 3
         },
         {
           "category": "bottom",
-          "weight": 0.0527,
+          "weight": 0.0526,
           "count": 2
         },
         {
           "category": "shoes",
-          "weight": 0.048,
+          "weight": 0.0479,
           "count": 2
         },
         {
           "category": "dress",
-          "weight": 0.024,
+          "weight": 0.0239,
           "count": 1
         }
       ],
@@ -2103,72 +2197,72 @@
         },
         {
           "subcategory": "cover-up",
-          "weight": 0.0947,
+          "weight": 0.1305,
+          "count": 4
+        },
+        {
+          "subcategory": "bikini",
+          "weight": 0.1068,
           "count": 3
         },
         {
           "subcategory": "sunglasses",
-          "weight": 0.0832,
+          "weight": 0.0833,
           "count": 3
         },
         {
-          "subcategory": "bikini",
-          "weight": 0.071,
-          "count": 2
+          "subcategory": "tote",
+          "weight": 0.0763,
+          "count": 3
         },
         {
           "subcategory": "shorts",
-          "weight": 0.0527,
-          "count": 2
-        },
-        {
-          "subcategory": "tote",
-          "weight": 0.0527,
+          "weight": 0.0526,
           "count": 2
         },
         {
           "subcategory": "bracelet",
-          "weight": 0.0525,
+          "weight": 0.0524,
           "count": 2
         },
         {
           "subcategory": "sandal",
-          "weight": 0.048,
-          "count": 2
-        },
-        {
-          "subcategory": "basket",
-          "weight": 0.0477,
+          "weight": 0.0479,
           "count": 2
         },
         {
           "subcategory": "earrings",
-          "weight": 0.0474,
+          "weight": 0.0356,
           "count": 1
         },
         {
           "subcategory": "hair-accessory",
-          "weight": 0.0474,
-          "count": 1
-        },
-        {
-          "subcategory": "shirt",
-          "weight": 0.0474,
+          "weight": 0.0356,
           "count": 1
         },
         {
           "subcategory": "necklace",
-          "weight": 0.0355,
+          "weight": 0.0356,
           "count": 1
         },
         {
           "subcategory": "sweatshirt",
-          "weight": 0.0288,
+          "weight": 0.0287,
           "count": 1
         },
         {
           "subcategory": "t-shirt",
-          "weight": 0.0288,
+          "weight": 0.0287,
+          "count": 1
+        },
+        {
+          "subcategory": "basket",
+          "weight": 0.0239,
+          "count": 1
+        },
+        {
+          "subcategory": "blouse",
+          "weight": 0.0239,
           "count": 1
         }
       ],
@@ -2176,154 +2270,154 @@
         "pairs": [
           {
             "combo": "hat+sunglasses",
-            "weight": 0.4283,
+            "weight": 0.4284,
+            "count": 3
+          },
+          {
+            "combo": "bikini+cover-up",
+            "weight": 0.427,
             "count": 3
           },
           {
             "combo": "cover-up+hat",
-            "weight": 0.4263,
+            "weight": 0.427,
             "count": 3
           },
           {
             "combo": "hat+sandal",
-            "weight": 0.2878,
+            "weight": 0.2871,
             "count": 2
           },
           {
             "combo": "shorts+tote",
-            "weight": 0.2876,
+            "weight": 0.2869,
             "count": 2
           },
           {
-            "combo": "basket+hat",
-            "weight": 0.2862,
+            "combo": "bracelet+tote",
+            "weight": 0.2859,
             "count": 2
           },
           {
-            "combo": "basket+sunglasses",
-            "weight": 0.2862,
-            "count": 2
-          },
-          {
-            "combo": "bikini+cover-up",
-            "weight": 0.2842,
+            "combo": "hat+tote",
+            "weight": 0.2858,
             "count": 2
           },
           {
             "combo": "bikini+hat",
-            "weight": 0.2842,
+            "weight": 0.2847,
             "count": 2
           },
           {
             "combo": "cover-up+sunglasses",
-            "weight": 0.2842,
+            "weight": 0.2847,
             "count": 2
           },
           {
             "combo": "basket+clutch",
-            "weight": 0.1441,
+            "weight": 0.1437,
+            "count": 1
+          },
+          {
+            "combo": "basket+hat",
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+maxi-dress",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+sandal",
-            "weight": 0.1441,
+            "weight": 0.1437,
+            "count": 1
+          },
+          {
+            "combo": "basket+sunglasses",
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "clutch+hat",
-            "weight": 0.1441,
-            "count": 1
-          },
-          {
-            "combo": "clutch+maxi-dress",
-            "weight": 0.1441,
-            "count": 1
-          },
-          {
-            "combo": "clutch+sandal",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           }
         ],
         "triples": [
           {
-            "combo": "basket+hat+sunglasses",
-            "weight": 0.2862,
-            "count": 2
-          },
-          {
             "combo": "bikini+cover-up+hat",
-            "weight": 0.2842,
+            "weight": 0.2847,
             "count": 2
           },
           {
             "combo": "cover-up+hat+sunglasses",
-            "weight": 0.2842,
+            "weight": 0.2847,
             "count": 2
           },
           {
             "combo": "basket+clutch+hat",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+clutch+maxi-dress",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+clutch+sandal",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+clutch+sunglasses",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+hat+maxi-dress",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+hat+sandal",
-            "weight": 0.1441,
+            "weight": 0.1437,
+            "count": 1
+          },
+          {
+            "combo": "basket+hat+sunglasses",
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+maxi-dress+sandal",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+maxi-dress+sunglasses",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "basket+sandal+sunglasses",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "clutch+hat+maxi-dress",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "clutch+hat+sandal",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           },
           {
             "combo": "clutch+hat+sunglasses",
-            "weight": 0.1441,
+            "weight": 0.1437,
             "count": 1
           }
         ]
@@ -2331,68 +2425,82 @@
       "vibe_keywords_top": [
         {
           "keyword": "coastal",
-          "weight": 0.1943,
-          "count": 7
-        },
-        {
-          "keyword": "boho",
-          "weight": 0.1387,
+          "weight": 0.1351,
           "count": 5
         },
         {
           "keyword": "resort",
-          "weight": 0.1384,
+          "weight": 0.1349,
           "count": 5
         },
         {
-          "keyword": "beach",
-          "weight": 0.1111,
+          "keyword": "relaxed",
+          "weight": 0.1081,
           "count": 4
         },
         {
-          "keyword": "vacation",
-          "weight": 0.0832,
-          "count": 3
-        },
-        {
-          "keyword": "minimal",
-          "weight": 0.056,
-          "count": 2
-        },
-        {
-          "keyword": "summer",
-          "weight": 0.0559,
-          "count": 2
+          "keyword": "boho",
+          "weight": 0.1079,
+          "count": 4
         },
         {
           "keyword": "chic",
-          "weight": 0.0556,
-          "count": 2
+          "weight": 0.081,
+          "count": 3
         },
         {
-          "keyword": "relaxed",
-          "weight": 0.0556,
+          "keyword": "vacation",
+          "weight": 0.0808,
+          "count": 3
+        },
+        {
+          "keyword": "beach",
+          "weight": 0.0543,
           "count": 2
         },
         {
           "keyword": "casual",
-          "weight": 0.0555,
+          "weight": 0.0543,
           "count": 2
         },
         {
           "keyword": "effortless",
-          "weight": 0.028,
+          "weight": 0.0543,
+          "count": 2
+        },
+        {
+          "keyword": "summer",
+          "weight": 0.0543,
+          "count": 2
+        },
+        {
+          "keyword": "minimal",
+          "weight": 0.0272,
+          "count": 1
+        },
+        {
+          "keyword": "beachside",
+          "weight": 0.0269,
           "count": 1
         },
         {
           "keyword": "beachwear",
-          "weight": 0.0276,
+          "weight": 0.0269,
+          "count": 1
+        },
+        {
+          "keyword": "breeze",
+          "weight": 0.0269,
+          "count": 1
+        },
+        {
+          "keyword": "breezy",
+          "weight": 0.0269,
           "count": 1
         }
       ],
       "absences": [
         "never pins: blazer + trouser",
-        "pins only once: dress-based looks",
         "never pins: skirt + top",
         "never pins: knit + jean",
         "never pins: jumpsuit",
@@ -2403,13 +2511,13 @@
         "never pins: mini skirts",
         "never pins: sneakers / trainers",
         "never pins: heels",
+        "pins only once: leather pieces",
         "pins only once: bold prints",
         "pins only once: jewellery / statement accessories",
         "never pins: red",
         "never pins: pink",
         "never pins: orange",
         "pins only once: yellow",
-        "pins only once: green",
         "pins only once: blue (non-navy)",
         "pins only once: purple",
         "never pins: burgundy"

@@ -6,9 +6,9 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { aggregate, parseJsonl, nearestHue, NEUTRALS, summaryLines } from "../aggregate.mjs";
+import { aggregate, parseJsonl, nearestHue, NEUTRALS, summaryLines, DEFAULT_HALF_LIFE_DAYS, parseArgs, selectTagRows } from "../aggregate.mjs";
 import { combinations } from "../aggregate-fashion.mjs";
-import { assignFormula } from "../formula-assign.mjs";
+import { assignFormula, impliedBase } from "../formula-assign.mjs";
 import { FORMULA_V2_IDS } from "../taxonomies/fashion.mjs";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -63,7 +63,10 @@ test("coverage: null tag, low confidence and non-outfit pins are excluded", () =
   assert.equal(p.coverage.undated, 1);
   assert.equal(p.coverage.date_min, "2022-01-10");
   assert.equal(p.coverage.date_max, "2026-09-20");
-  assert.equal(p.coverage.half_life_days, 730);
+  assert.equal(p.coverage.half_life_days, 1095, "default half-life is three years (owner decision 2026-10-12)");
+  assert.equal(DEFAULT_HALF_LIFE_DAYS, 1095);
+  assert.equal(parseArgs([]).halfLifeDays, 1095, "CLI default");
+  assert.equal(parseArgs(["--half-life-days", "730"]).halfLifeDays, 730, "still overridable");
   assert.deepEqual(p.coverage.boards, ["my-style", "swim-look"]);
   assert.equal(p.boards["my-style"].pins_used, 6);
   assert.equal(p.boards["swim-look"].pins_used, 3);
@@ -94,8 +97,14 @@ test("recency weighting favours newer pins at equal counts", () => {
   assert.equal(newest.count, 1);
   assert.equal(oldest.count, 1);
   assert.ok(newest.weight > oldest.weight, `${newest.weight} should exceed ${oldest.weight}`);
-  // ~4.7 years at a 2-year half-life: oldest should be well under a quarter of newest.
-  assert.ok(oldest.weight / newest.weight < 0.25);
+  // 1715 days at the default 3-year half-life: 0.5^(1715/1095) ≈ 0.34 of newest.
+  approx(oldest.weight / newest.weight, Math.pow(0.5, 1715 / 1095), 2e-3);
+  assert.ok(oldest.weight / newest.weight < 0.5);
+  // The old 2-year half-life, passed explicitly, is steeper: well under a quarter.
+  const steep = run({ halfLifeDays: 730 });
+  const bySteep = Object.fromEntries(steep.overall.formula_weights.map((r) => [r.formula, r]));
+  assert.ok(bySteep["jeans+tee+sneaker"].weight / bySteep["slip-dress+sandal"].weight < 0.25);
+  assert.equal(steep.coverage.half_life_days, 730);
   // A long half-life flattens the difference.
   const flat = run({ halfLifeDays: 100000 });
   const byFlat = Object.fromEntries(flat.overall.formula_weights.map((r) => [r.formula, r]));
@@ -259,6 +268,53 @@ test("formula_weights_v2: assigned from garments, sums to 1, coverage = 1 - othe
   assert.ok(p.overall.formula_weights_v2.some((r) => r.formula === "blazer+wide-leg-trouser+loafer"));
 });
 
+test("every weighted list carries the raw count next to the share, so a draft can cite both", () => {
+  const p = run();
+  const isRow = (r) => Number.isInteger(r.count) && r.count >= 1 && typeof r.weight === "number" && r.weight >= 0 && r.weight <= 1;
+  for (const scope of [p.overall, p.boards["my-style"], p.boards["swim-look"]]) {
+    const lists = [
+      scope.formula_weights, scope.formula_weights_v2, scope.silhouettes, scope.seasons, scope.occasions,
+      scope.garment_mix, scope.subcategory_top, scope.vibe_keywords_top, scope.dominant_colors,
+      scope.palette.neutrals, scope.palette.secondary, scope.palette.accent,
+      scope.garment_combos_top.pairs, scope.garment_combos_top.triples,
+    ];
+    for (const list of lists) {
+      assert.ok(Array.isArray(list));
+      for (const r of list) assert.ok(isRow(r), JSON.stringify(r));
+    }
+    for (const lvl of ["1", "2", "3", "4", "5"]) {
+      const h = scope.formality_histogram[lvl];
+      assert.ok(Number.isInteger(h.count) && typeof h.weight === "number", JSON.stringify(h));
+    }
+  }
+  // A once-popular, now-old formula shows the disagreement the seed prompt is told to read: count high, share low.
+  const old = p.overall.formula_weights.find((r) => r.formula === "jeans+tee+sneaker");
+  assert.equal(old.count, 1);
+  assert.ok(old.weight < 1 / p.overall.pins_used, "an old pin's share is below its count share");
+});
+
+test("coverage.assumed_base_count: used pins the matcher treated as a top-half crop (implied jeans)", () => {
+  const p = run();
+  const used = TAGS.filter((t) => t.tag && t.tag.confidence >= 0.5 && t.tag.is_outfit !== false);
+  assert.equal(p.coverage.assumed_base_count, used.filter((t) => impliedBase(t.tag.garments) !== null).length);
+  assert.ok(Number.isInteger(p.coverage.assumed_base_count));
+  const keys = Object.keys(p.coverage);
+  assert.equal(keys[keys.indexOf("outfit_share") + 1], "assumed_base_count", "sits right after outfit_share");
+  // Two crops among three pins: counted in coverage, assigned whole-look formulas in formula_weights_v2.
+  const mk = (id, garments, extra = {}) => ({
+    pin_id: id, board: "b",
+    tag: { is_outfit: true, garments, formula: "other", silhouette: "s", formality: 2, season: "x", occasion: "y", vibe_keywords: ["a"], confidence: 1, ...extra },
+  });
+  const gm = (...subs) => subs.map((s) => ({ category: { "t-shirt": "top", necklace: "jewelry", jeans: "bottom", "knit-sweater": "top", shirt: "top" }[s], subcategory: s, colour: "black", pattern: "solid", fabric: "unknown" }));
+  const tags = [mk("crop1", gm("t-shirt", "necklace")), mk("crop2", gm("knit-sweater", "shirt")), mk("full", gm("jeans", "t-shirt")), mk("skip", gm("t-shirt"), { is_outfit: false })];
+  const pins = tags.map((t) => ({ pin_id: t.pin_id, board: "b", created_at: "2026-01-01T00:00:00Z" }));
+  const q = aggregate({ tags, pins });
+  assert.equal(q.coverage.used, 3);
+  assert.equal(q.coverage.assumed_base_count, 2, "the non-outfit crop is not counted");
+  assert.deepEqual(Object.fromEntries(q.overall.formula_weights_v2.map((r) => [r.formula, r.count])), { "jeans+tee+sunglasses": 1, "jeans+knit+shirt": 1, "jeans+tee": 1 });
+  assert.equal(q.overall.formula_v2_coverage, 1);
+});
+
 test("CLI writes the profile and prints a summary to stderr", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "style-data-agg-"));
   const pinsPath = path.join(tmp, "pins.jsonl");
@@ -280,6 +336,8 @@ test("CLI writes the profile and prints a summary to stderr", () => {
   const lines = stderr.trim().split("\n");
   assert.ok(lines.length >= 15, `expected >=15 summary lines, got ${lines.length}`);
   assert.match(lines[0], /taste profile/);
+  assert.match(lines[2], /half-life 1095d/, "the summary names the default half-life");
+  assert.equal(JSON.parse(fs.readFileSync(outPath, "utf8")).coverage.half_life_days, 1095, "no flag -> the 1095-day default is written");
   // Usage errors exit 2: --help, a missing input file, an unknown domain exits 1.
   assert.throws(() => execFileSync(process.execPath, [SCRIPT, "--help"], { stdio: "ignore" }), (e) => e.status === 2);
   assert.throws(() => execFileSync(process.execPath, [SCRIPT, "--tags", path.join(tmp, "nope.jsonl"), "--pins", pinsPath, "--out", outPath], { stdio: "ignore" }), (e) => e.status === 2);
@@ -294,4 +352,36 @@ test("rows without a domain fall back to boards.json; foreign-domain rows are ex
   const mixed = aggregate({ tags: [...TAGS, homeRow], pins: [...PINS, { pin_id: "h99", board: "for-the-home", created_at: "2026-09-01T00:00:00Z" }] });
   assert.deepEqual(mixed, run());
   assert.equal(mixed.coverage.pins_total, 12);
+});
+
+test("selectTagRows: one row per pin, preferring the current prompt version, else the last success, else the last failure", () => {
+  const t = (pin_id, prompt_version, tag, domain = "fashion") => ({ pin_id, domain, prompt_version, tag });
+  const good = { is_outfit: true, garments: [], formula: "other", silhouette: "s", formality: 2, season: "x", occasion: "y", vibe_keywords: ["a"], confidence: 1 };
+  const rows = [
+    t("a", "fashion.tag.v1", good),
+    t("a", "fashion.tag.v2", { ...good, formula: "jeans+tee" }),
+    t("b", "fashion.tag.v2", null),           // v2 failed …
+    t("b", "fashion.tag.v1", good),           // … keep the v1 success
+    t("c", "fashion.tag.v1", null),
+    t("c", "fashion.tag.v1", null),           // all failed: keep one failure row
+    t("d", "fashion.tag.v1", good),
+    t("d", "fashion.tag.v2", good),
+    t("d", "fashion.tag.v2", null),           // a later v2 failure must not displace the v2 success
+    t("h", "home.tag.v1", good, "home"),
+  ];
+  const sel = selectTagRows(rows, { preferVersion: "fashion.tag.v2" });
+  const by = Object.fromEntries(sel.map((r) => [`${r.pin_id}/${r.domain}`, r]));
+  assert.equal(sel.length, 5);
+  assert.equal(by["a/fashion"].tag.formula, "jeans+tee");
+  assert.equal(by["b/fashion"].prompt_version, "fashion.tag.v1");
+  assert.equal(by["c/fashion"].tag, null);
+  assert.equal(by["d/fashion"].prompt_version, "fashion.tag.v2");
+  assert.ok(by["d/fashion"].tag);
+  assert.equal(by["h/home"].prompt_version, "home.tag.v1");
+  // Through the aggregate: a pin tagged twice is counted once, and the version mix is reported.
+  const pins = [{ pin_id: "a", board: "b", domain: "fashion", created_at: "2026-01-01T00:00:00Z" }, { pin_id: "d", board: "b", domain: "fashion", created_at: "2026-01-02T00:00:00Z" }];
+  const p = aggregate({ tags: rows.filter((r) => ["a", "d"].includes(r.pin_id)), pins });
+  assert.equal(p.coverage.tagged, 2);
+  assert.equal(p.coverage.used, 2);
+  assert.deepEqual(p.coverage.tag_versions, { "fashion.tag.v2": 2 });
 });

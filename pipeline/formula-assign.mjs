@@ -17,6 +17,12 @@
 // with more slots (more specific), then by list order. A best score below
 // `minScore` (default MIN_SCORE = 1.5, i.e. "two things that belong together")
 // is `other`. Pure functions, no I/O.
+//
+// Implied base (proposal §8, decision 2): a pin cropped to the top half — at
+// least one `top` garment and no bottom / dress / swim garment at all — is
+// matched as if it also showed `jeans` (owner: "95% chance in real life it's
+// denim"), and the result says so in `assumed_base: "jeans"` (null otherwise).
+// A dress alone, or accessories alone, gets no assumption.
 
 import { FORMULAS_V2, SUBCATEGORY_TO_CATEGORY } from "./taxonomies/fashion.mjs";
 
@@ -33,6 +39,24 @@ function normGarment(g) {
 }
 
 const slotAccepts = (slot, g) => slot.any.includes(g.subcategory) || slot.any.includes(g.category);
+
+/** The subcategory assumed under a top-half crop. */
+export const ASSUMED_BASE = "jeans";
+/** Categories that count as a visible base; any one of them switches the assumption off. */
+export const BASE_CATEGORIES = Object.freeze(["bottom", "dress", "swim"]);
+
+/**
+ * Which base to imply for a garment list, or null: ASSUMED_BASE when there is
+ * at least one `top` garment and no bottom / dress / swim garment at all.
+ * @param {Array<{category?:string, subcategory?:string}|string>} garments
+ * @returns {string|null}
+ */
+export function impliedBase(garments) {
+  const gs = (Array.isArray(garments) ? garments : []).map(normGarment);
+  const hasTop = gs.some((g) => g.category === "top");
+  const hasBase = gs.some((g) => BASE_CATEGORIES.includes(g.category));
+  return hasTop && !hasBase ? ASSUMED_BASE : null;
+}
 
 /**
  * Best assignment of garments to one formula's slots (one garment per slot).
@@ -72,14 +96,17 @@ export function matchFormula(formula, garments) {
  * Assign the best-fitting formula to a garment list.
  * @param {Array<{category?:string, subcategory?:string}|string>} garments  a tag's garments[] (or bare subcategory ids)
  * @param {Array<{id:string, slots:Array<{name:string, any:string[], required:boolean}>}>} [formulas=FORMULAS_V2]
- * @param {{minScore?:number}} [opts]
- * @returns {{formula:string, score:number, matched_slots:string[], missing_required:string[]}}
+ * @param {{minScore?:number, assumeBase?:boolean}} [opts]  assumeBase=false switches the implied jeans base off
+ * @returns {{formula:string, score:number, matched_slots:string[], missing_required:string[], assumed_base:string|null}}
  *   For `other`, `score`/`matched_slots`/`missing_required` describe the nearest
  *   miss (the highest-scoring formula that was not a candidate), so a residual
- *   can be read as "would be X if it had Y".
+ *   can be read as "would be X if it had Y". `assumed_base` is the base the
+ *   matcher implied for a top-half crop (see impliedBase), null otherwise.
  */
-export function assignFormula(garments, formulas = FORMULAS_V2, { minScore = MIN_SCORE } = {}) {
-  const gs = Array.isArray(garments) ? garments : [];
+export function assignFormula(garments, formulas = FORMULAS_V2, { minScore = MIN_SCORE, assumeBase = true } = {}) {
+  const visible = Array.isArray(garments) ? garments : [];
+  const assumed = assumeBase ? impliedBase(visible) : null;
+  const gs = assumed ? [...visible, { category: SUBCATEGORY_TO_CATEGORY[assumed], subcategory: assumed }] : visible;
   let winner = null;
   let nearest = null;
   formulas.forEach((f, order) => {
@@ -92,27 +119,28 @@ export function assignFormula(garments, formulas = FORMULAS_V2, { minScore = MIN
       nearest = row;
     }
   });
-  if (winner) return { formula: winner.formula, score: winner.score, matched_slots: winner.matched_slots, missing_required: [] };
+  if (winner) return { formula: winner.formula, score: winner.score, matched_slots: winner.matched_slots, missing_required: [], assumed_base: assumed };
   return {
     formula: "other",
     score: nearest ? nearest.score : 0,
     matched_slots: nearest ? nearest.matched_slots : [],
     missing_required: nearest ? nearest.missing_required : [],
     nearest: nearest ? nearest.formula : null,
+    assumed_base: assumed,
   };
 }
 
 /**
  * Convenience: assign a formula to every tag row that has a tag.
  * @param {Array<{pin_id:string, tag:object|null}>} tagRows  tags.jsonl rows
- * @param {object} [opts]  passed to assignFormula ({formulas, minScore})
- * @returns {Array<{pin_id:string, formula_v1:string|null, formula:string, score:number, matched_slots:string[], missing_required:string[]}>}
+ * @param {object} [opts]  passed to assignFormula ({formulas, minScore, assumeBase})
+ * @returns {Array<{pin_id:string, formula_v1:string|null, formula:string, score:number, matched_slots:string[], missing_required:string[], assumed_base:string|null}>}
  */
-export function assignAll(tagRows, { formulas = FORMULAS_V2, minScore = MIN_SCORE } = {}) {
+export function assignAll(tagRows, { formulas = FORMULAS_V2, minScore = MIN_SCORE, assumeBase = true } = {}) {
   const out = [];
   for (const r of tagRows ?? []) {
     if (!r?.tag || typeof r.tag !== "object") continue;
-    const a = assignFormula(r.tag.garments, formulas, { minScore });
+    const a = assignFormula(r.tag.garments, formulas, { minScore, assumeBase });
     out.push({ pin_id: r.pin_id, formula_v1: r.tag.formula ?? null, ...a });
   }
   return out;

@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import {
   CATEGORIES, SUBCATEGORIES, ALL_SUBCATEGORIES, SUBCATEGORY_TO_CATEGORY, COLOURS, NEUTRALS, PATTERNS, FABRICS,
   FORMALITY, FORMALITY_LEVELS, SEASONS, WARMTH, FORMULAS, FORMULA_IDS, SILHOUETTES, OCCASIONS,
-  garmentSchema, tagSchema, validateTag, DOMAIN, PROMPT_VERSION, TAG_PROMPT, TAG_PROMPT_FASHION_V1,
-  FORMULAS_V2, FORMULA_V2_IDS, FORMULA_V2_LINES, describeFormulaV2, tagSchemaV2, validateTagV2, TAG_PROMPT_FASHION_V2, PROMPT_VERSION_V2, VERSIONS,
+  garmentSchema, tagSchema, validateTag, DOMAIN, PROMPT_VERSION, TAG_PROMPT, TAG_PROMPT_FASHION_V1, PROMPT_VERSION_V1, tagSchemaV1, validateTagV1,
+  FORMULAS_V2, FORMULA_V2_IDS, FORMULA_V2_LINES, describeFormulaV2, tagSchemaV2, validateTagV2, TAG_PROMPT_FASHION_V2, PROMPT_VERSION_V2, VERSIONS, DEFAULT_VERSION,
 } from "../taxonomies/fashion.mjs";
 import { DOMAINS, DOMAIN_NAMES, getDomain } from "../taxonomies/index.mjs";
 
@@ -71,7 +71,8 @@ test("schema enums equal the data", () => {
   assert.deepEqual(garmentSchema.required, Object.keys(p));
 
   const t = tagSchema.properties;
-  assert.deepEqual(t.formula.enum, [...FORMULA_IDS]);
+  assert.deepEqual(t.formula.enum, [...FORMULA_V2_IDS], "the domain-interface schema is v2 since the 2026-10-12 review");
+  assert.deepEqual(tagSchemaV1.properties.formula.enum, [...FORMULA_IDS]);
   assert.deepEqual(t.silhouette.enum, [...SILHOUETTES]);
   assert.deepEqual(t.season.enum, [...SEASONS]);
   assert.deepEqual(t.occasion.enum, [...OCCASIONS]);
@@ -120,13 +121,26 @@ test("validateTag rejects bad enums, ranges and missing fields", () => {
   }
 });
 
-test("fashion module exposes the domain interface and its versioned prompt", () => {
+test("fashion module exposes the domain interface and its versioned prompt (v2 is the default since 2026-10-12)", () => {
   assert.equal(DOMAIN, "fashion");
-  assert.equal(PROMPT_VERSION, "fashion.tag.v1");
-  assert.equal(TAG_PROMPT, TAG_PROMPT_FASHION_V1);
+  assert.equal(DEFAULT_VERSION, "v2");
+  assert.equal(PROMPT_VERSION, "fashion.tag.v2");
+  assert.equal(PROMPT_VERSION, PROMPT_VERSION_V2);
+  assert.equal(PROMPT_VERSION_V1, "fashion.tag.v1");
+  assert.equal(TAG_PROMPT, TAG_PROMPT_FASHION_V2);
+  assert.equal(tagSchema, tagSchemaV2);
   assert.match(TAG_PROMPT, /set is_outfit=false and still tag visible garments/);
   for (const c of COLOURS) assert.ok(TAG_PROMPT.includes(c), `prompt lacks colour ${c}`);
-  for (const f of FORMULA_IDS) assert.ok(TAG_PROMPT.includes(f), `prompt lacks formula ${f}`);
+  for (const f of FORMULA_V2_IDS) assert.ok(TAG_PROMPT.includes(f), `prompt lacks formula ${f}`);
+  // The aliases are exactly VERSIONS[DEFAULT_VERSION], so tag.mjs and a direct consumer agree.
+  const cur = VERSIONS[DEFAULT_VERSION];
+  assert.equal(cur.PROMPT_VERSION, PROMPT_VERSION);
+  assert.equal(cur.TAG_PROMPT, TAG_PROMPT);
+  assert.equal(cur.tagSchema, tagSchema);
+  assert.equal(cur.validateTag(goodTag()).ok, validateTag(goodTag()).ok);
+  // v1 stays a complete, selectable contract.
+  for (const f of FORMULA_IDS) assert.ok(TAG_PROMPT_FASHION_V1.includes(f), `v1 prompt lacks formula ${f}`);
+  assert.equal(VERSIONS.v1.PROMPT_VERSION, PROMPT_VERSION_V1);
 });
 
 test("domain registry: every domain exports the same interface; unknown names throw", () => {
@@ -135,7 +149,7 @@ test("domain registry: every domain exports the same interface; unknown names th
     const d = getDomain(name);
     assert.equal(d, DOMAINS[name]);
     assert.equal(d.DOMAIN, name);
-    assert.equal(d.PROMPT_VERSION, `${name}.tag.v1`);
+    assert.equal(d.PROMPT_VERSION, `${name}.tag.${d.DEFAULT_VERSION ?? "v1"}`);
     assert.equal(typeof d.TAG_PROMPT, "string");
     assert.ok(d.TAG_PROMPT.length > 500);
     assert.equal(d.tagSchema.type, "OBJECT");
@@ -144,6 +158,10 @@ test("domain registry: every domain exports the same interface; unknown names th
   }
   assert.throws(() => getDomain("garden"), /unknown domain 'garden' \(known: fashion, home\)/);
   assert.throws(() => getDomain(undefined), /unknown domain/);
+  assert.equal(DOMAINS.fashion.DEFAULT_VERSION, "v2");
+  assert.equal(DOMAINS.fashion.PROMPT_VERSION, "fashion.tag.v2");
+  assert.equal(DOMAINS.home.DEFAULT_VERSION, undefined, "home has one version and no VERSIONS map");
+  assert.equal(DOMAINS.home.PROMPT_VERSION, "home.tag.v1");
 });
 
 // --- v2 formulas (docs/formula-v2-proposal.md) ---------------------------------------
@@ -178,40 +196,72 @@ test("FORMULAS_V2: ids unique, 14-22 formulas plus 'other', the brief's three ke
   assert.equal(describeFormulaV2(FORMULAS_V2.at(-1)), "other = none of the above");
 });
 
-test("v2 schema, prompt and version: enum = v2 ids, prompt names every v2 id and the layering rule, v1 untouched", () => {
+test("v2 schema, prompt and version: enum = v2 ids, prompt names every v2 id, the layering rule and the cropped-pin rule; v1 untouched", () => {
   assert.deepEqual(tagSchemaV2.properties.formula.enum, [...FORMULA_V2_IDS]);
-  assert.deepEqual(tagSchema.properties.formula.enum, [...FORMULA_IDS], "v1 schema keeps the v1 enum");
+  assert.deepEqual(tagSchemaV1.properties.formula.enum, [...FORMULA_IDS], "v1 schema keeps the v1 enum");
   assert.equal(tagSchemaV2.properties.garments.items, garmentSchema);
   const { formula: f2, ...restV2 } = tagSchemaV2.properties;
-  const { formula: f1, ...restV1 } = tagSchema.properties;
+  const { formula: f1, ...restV1 } = tagSchemaV1.properties;
   assert.deepEqual(restV2, restV1, "v2 differs from v1 only in the formula enum");
   assert.equal(PROMPT_VERSION_V2, "fashion.tag.v2");
-  assert.equal(PROMPT_VERSION, "fashion.tag.v1", "the default stays v1 until the review");
-  assert.equal(TAG_PROMPT, TAG_PROMPT_FASHION_V1);
+  assert.equal(PROMPT_VERSION, "fashion.tag.v2", "the default is v2 since the owner review of 2026-10-12");
+  assert.equal(TAG_PROMPT, TAG_PROMPT_FASHION_V2);
   for (const id of FORMULA_V2_IDS) assert.ok(TAG_PROMPT_FASHION_V2.includes(id), `v2 prompt lacks ${id}`);
   for (const line of FORMULA_V2_LINES) assert.ok(TAG_PROMPT_FASHION_V2.includes(line), `v2 prompt lacks slot line ${line}`);
   assert.match(TAG_PROMPT_FASHION_V2, /Layering accessories count toward the formula/);
+  // Decision 2: the prompt mirrors the matcher's implied jeans base, with this exact sentence.
+  assert.ok(TAG_PROMPT_FASHION_V2.includes("If the bottom half is cropped out, assume jeans when choosing the formula."));
+  assert.ok(!TAG_PROMPT_FASHION_V1.includes("assume jeans"), "v1 prompt text is byte-for-byte what the first run used");
   assert.match(TAG_PROMPT_FASHION_V2, /set is_outfit=false and still tag visible garments/);
   for (const c of COLOURS) assert.ok(TAG_PROMPT_FASHION_V2.includes(c), `v2 prompt lacks colour ${c}`);
-  // v1-only ids are not offered by the v2 prompt's formula list.
+  // v1-only ids are not offered by the v2 prompt's formula list, nor is the dropped cropped formula.
   const v2FormulaBlock = TAG_PROMPT_FASHION_V2.slice(TAG_PROMPT_FASHION_V2.indexOf("- formula:"), TAG_PROMPT_FASHION_V2.indexOf("- silhouette:"));
-  for (const id of ["jeans+tee+sneaker", "tonal-monochrome", "matching-set"]) assert.ok(!v2FormulaBlock.includes(`${id} =`), `v2 prompt still lists ${id}`);
+  for (const id of ["jeans+tee+sneaker", "tonal-monochrome", "matching-set", "knit+shirt+necklace"]) assert.ok(!v2FormulaBlock.includes(`${id} =`), `v2 prompt still lists ${id}`);
+  assert.ok(!TAG_PROMPT_FASHION_V2.includes("knit+shirt+necklace"), "the cropped formula is gone from the rule text too");
   assert.deepEqual(Object.keys(VERSIONS), ["v1", "v2"]);
   assert.equal(VERSIONS.v1.TAG_PROMPT, TAG_PROMPT_FASHION_V1);
-  assert.equal(VERSIONS.v1.tagSchema, tagSchema);
+  assert.equal(VERSIONS.v1.tagSchema, tagSchemaV1);
+  assert.equal(VERSIONS.v1.PROMPT_VERSION, "fashion.tag.v1");
+  assert.equal(VERSIONS.v1.validateTag, validateTagV1);
   assert.equal(VERSIONS.v2.PROMPT_VERSION, PROMPT_VERSION_V2);
   assert.equal(VERSIONS.v2.tagSchema, tagSchemaV2);
   assert.deepEqual(VERSIONS.v2.FORMULA_IDS, FORMULA_V2_IDS);
 });
 
-test("validateTag accepts v2 ids only under version v2; validateTagV2 is that shortcut", () => {
+test("decision 1 + 4: the plain pairs are in v2; matching-set / tonal-monochrome are absent from every v2 surface and still in v1", () => {
+  for (const id of ["jeans+tee", "jeans+knit"]) {
+    assert.ok(FORMULA_V2_IDS.includes(id), `v2 lacks ${id}`);
+    assert.ok(tagSchemaV2.properties.formula.enum.includes(id));
+    assert.ok(TAG_PROMPT_FASHION_V2.includes(`${id} = `), `v2 prompt lacks a slot line for ${id}`);
+    assert.ok(!FORMULA_IDS.includes(id), `${id} is a v2-only id`);
+  }
+  assert.ok(!FORMULA_V2_IDS.includes("knit+shirt+necklace"), "the cropped-pin formula is replaced by the implied jeans base");
+  for (const id of ["matching-set", "tonal-monochrome"]) {
+    assert.ok(!FORMULA_V2_IDS.includes(id), `${id} must not be in FORMULAS_V2`);
+    assert.ok(!FORMULAS_V2.some((f) => f.id === id));
+    assert.ok(!tagSchemaV2.properties.formula.enum.includes(id), `${id} must not be in tagSchemaV2`);
+    assert.ok(!TAG_PROMPT_FASHION_V2.includes(id), `${id} must not be in the v2 prompt`);
+    assert.ok(validateTagV2({ ...goodTag(), formula: id }).errors.some((e) => e === `formula invalid: ${id}`));
+    // v1 untouched.
+    assert.ok(FORMULA_IDS.includes(id));
+    assert.ok(tagSchemaV1.properties.formula.enum.includes(id));
+    assert.ok(TAG_PROMPT_FASHION_V1.includes(id));
+    assert.equal(validateTagV1({ ...goodTag(), formula: id }).ok, true);
+  }
+});
+
+test("validateTag defaults to v2; v1 ids need version v1 (validateTagV1); validateTagV2 is the explicit shortcut", () => {
   const v2 = { ...goodTag(), formula: "jeans+cardigan+tee" };
-  assert.equal(validateTag(v2).ok, false, "a v2 id is not a v1 id");
+  assert.equal(validateTag(v2, { version: "v1" }).ok, false, "a v2 id is not a v1 id");
+  assert.equal(validateTagV1(v2).ok, false);
+  assert.deepEqual(validateTag(v2), { ok: true, errors: [] }, "default version is v2");
   assert.deepEqual(validateTag(v2, { version: "v2" }), { ok: true, errors: [] });
   assert.deepEqual(validateTagV2(v2), { ok: true, errors: [] });
   assert.equal(VERSIONS.v2.validateTag(v2).ok, true);
   const v1Only = { ...goodTag(), formula: "jeans+tee+sneaker" };
-  assert.equal(validateTag(v1Only).ok, true);
+  assert.equal(validateTagV1(v1Only).ok, true);
+  assert.equal(validateTag(v1Only, { version: "v1" }).ok, true);
+  assert.equal(validateTag(v1Only).ok, false, "a v1-only id fails the v2 default");
   assert.ok(validateTagV2(v1Only).errors.some((e) => /formula invalid: jeans\+tee\+sneaker/.test(e)));
   assert.equal(validateTagV2(goodTag()).ok, true, "the brief's blazer formula is kept in v2");
   assert.equal(validateTagV2({ ...goodTag(), formula: "other" }).ok, true);

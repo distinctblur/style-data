@@ -95,6 +95,9 @@ test("SEED_PROMPT_V1 names all six sections and the JSON block", () => {
   assert.ok(SEED_PROMPT_V1.includes("parsed_constraints_json"));
   for (const k of CONSTRAINT_KEYS) assert.ok(SEED_PROMPT_V1.includes(`"${k}"`), `prompt missing key ${k}`);
   assert.ok(SEED_PROMPT_V1.includes("second person"));
+  // Owner decision 2026-10-12 (formula-v2-proposal §8, recency): the draft reads count and share together.
+  assert.ok(SEED_PROMPT_V1.includes("Where a share and its raw count disagree (a large count with a small share), say that it was a bigger interest in the past."));
+  assert.ok(SEED_PROMPT_V1.includes("`count` is the raw number of pins behind it."), "the count sentence that precedes it is unchanged");
 });
 
 test("mock draft has all six headings, checklist boxes and a parsable JSON block", () => {

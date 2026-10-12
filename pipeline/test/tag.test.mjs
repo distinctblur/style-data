@@ -5,11 +5,11 @@ import os from "node:os";
 import path from "node:path";
 import {
   TAG_PROMPT_V1, PROMPT_VERSION, MAX_IMAGE_BYTES, DEFAULT_BOARDS_PATH, mockTag, tagPins, callGemini, costUsd, parseCli, formatSummary,
-  readJsonl, buildRequestBody, loadBoardDomains, pinDomain, taggedKeys, resolveVersion, DEFAULT_PROMPT_VERSION,
+  readJsonl, buildRequestBody, loadBoardDomains, pinDomain, taggedKeys, resolveVersion, defaultPromptVersion, legacyPromptVersion,
 } from "../tag.mjs";
 import {
-  validateTag, validateTagV2, CATEGORIES, FORMULA_IDS, FORMULA_V2_IDS, COLOURS, PROMPT_VERSION as FASHION_PROMPT_VERSION,
-  TAG_PROMPT_FASHION_V1, TAG_PROMPT_FASHION_V2, tagSchemaV2, VERSIONS,
+  validateTag, validateTagV1, validateTagV2, CATEGORIES, FORMULA_IDS, FORMULA_V2_IDS, COLOURS, PROMPT_VERSION as FASHION_PROMPT_VERSION,
+  TAG_PROMPT_FASHION_V1, TAG_PROMPT_FASHION_V2, tagSchemaV1, tagSchemaV2, VERSIONS,
 } from "../taxonomies/fashion.mjs";
 import * as home from "../taxonomies/home.mjs";
 import { getDomain } from "../taxonomies/index.mjs";
@@ -61,7 +61,7 @@ test("TAG_PROMPT_V1 names the taxonomy enums and the non-outfit rule", () => {
   for (const f of FORMULA_IDS) assert.ok(TAG_PROMPT_V1.includes(f), `prompt lacks formula ${f}`);
   for (const c of COLOURS) assert.ok(TAG_PROMPT_V1.includes(c), `prompt lacks colour ${c}`);
   assert.ok(TAG_PROMPT_V1.includes("one-piece"));
-  assert.equal(PROMPT_VERSION, "fashion.tag.v1");
+  assert.equal(PROMPT_VERSION, "fashion.tag.v2", "tag.mjs's PROMPT_VERSION alias follows the fashion default (v2 since 2026-10-12)");
   assert.equal(PROMPT_VERSION, FASHION_PROMPT_VERSION);
   assert.equal(getDomain("home").PROMPT_VERSION, "home.tag.v1");
 });
@@ -101,7 +101,8 @@ test("mock run tags 3 pins, skips a video and a dupe, writes valid records", asy
     assert.equal(r.board, "my-style");
     assert.equal(r.domain, "fashion", "domain derived from boards.json");
     assert.equal(r.model, "mock");
-    assert.equal(r.prompt_version, "fashion.tag.v1");
+    assert.equal(r.prompt_version, "fashion.tag.v2", "mock mode is v2 by default for fashion");
+    assert.ok(validateTagV2(r.tag).ok);
     assert.equal(r.error, null);
     assert.equal(r.usage, null);
     assert.equal(r.cost_usd, null);
@@ -126,7 +127,7 @@ test("--only-missing resumes: appends only untagged pins, retries failed ones", 
   const first = await tagPins({ inPath, outPath, boardsPath, mock: true, log: quiet });
   assert.equal(first.tagged, 3);
   // Simulate an earlier failure for p2 and a new pin p4.
-  fs.appendFileSync(outPath, JSON.stringify({ pin_id: "p2", board: "my-style", domain: "fashion", model: "gemini-3.6-flash", prompt_version: "fashion.tag.v1", tag: null, error: "upstream 503", usage: null, cost_usd: null, ms: 1 }) + "\n");
+  fs.appendFileSync(outPath, JSON.stringify({ pin_id: "p2", board: "my-style", domain: "fashion", model: "gemini-3.6-flash", prompt_version: "fashion.tag.v2", tag: null, error: "upstream 503", usage: null, cost_usd: null, ms: 1 }) + "\n");
   writePins([p1, p2, p3, pin("p4")]);
   const second = await tagPins({ inPath, outPath, boardsPath, mock: true, onlyMissing: true, log: quiet });
   assert.equal(second.tagged, 1, "p2 already has a success record; only p4 is new");
@@ -176,7 +177,8 @@ test("live path: fake fetch sees the structured-output request and a valid reply
   assert.equal(body.generationConfig.responseMimeType, "application/json");
   assert.equal(body.generationConfig.responseSchema.type, "OBJECT");
   assert.ok(!("responseFormat" in body.generationConfig), "never hedge between config shapes");
-  assert.equal(body.contents[0].parts[0].text, TAG_PROMPT_V1);
+  assert.equal(body.contents[0].parts[0].text, TAG_PROMPT_FASHION_V2, "a default fashion run sends the v2 prompt");
+  assert.deepEqual(body.generationConfig.responseSchema, tagSchemaV2);
   assert.equal(body.contents[0].parts[1].inlineData.mimeType, "image/jpeg");
   assert.equal(body.contents[0].parts[1].inlineData.data, Buffer.alloc(1024, 1).toString("base64"));
   const [rec] = s.records;
@@ -262,7 +264,7 @@ test("costUsd and parseCli", () => {
   assert.equal(costUsd({ promptTokenCount: 0, candidatesTokenCount: 1e6, thoughtsTokenCount: 1e6 }, 0.5, 3), 6);
 
   const o = parseCli(["--domain", "home", "--boards", "b.json", "--in", "a.jsonl", "--out", "b.jsonl", "--limit", "5", "--concurrency", "2", "--only-missing", "--mock", "--price-in", "0.5", "--price-out", "3"]);
-  assert.deepEqual(o, { domain: "home", boardsPath: "b.json", inPath: "a.jsonl", outPath: "b.jsonl", limit: 5, model: "gemini-3.6-flash", concurrency: 2, onlyMissing: true, mock: true, priceIn: 0.5, priceOut: 3, promptVersion: "v1" });
+  assert.deepEqual(o, { domain: "home", boardsPath: "b.json", inPath: "a.jsonl", outPath: "b.jsonl", limit: 5, model: "gemini-3.6-flash", concurrency: 2, onlyMissing: true, mock: true, priceIn: 0.5, priceOut: 3, promptVersion: null });
   const d = parseCli([]);
   assert.equal(d.domain, null, "no --domain: every pin is tagged with its board's domain");
   assert.equal(d.boardsPath, DEFAULT_BOARDS_PATH);
@@ -277,7 +279,7 @@ test("costUsd and parseCli", () => {
 
   const body = buildRequestBody({ mimeType: "image/png", data: "QUJD" });
   assert.deepEqual(Object.keys(body.generationConfig), ["responseMimeType", "responseSchema"]);
-  assert.equal(body.contents[0].parts[0].text, TAG_PROMPT_FASHION_V1, "default domain is fashion");
+  assert.equal(body.contents[0].parts[0].text, TAG_PROMPT_FASHION_V2, "default domain is fashion, at its default version v2");
   const homeBody = buildRequestBody({ mimeType: "image/png", data: "QUJD" }, "home");
   assert.equal(homeBody.contents[0].parts[0].text, home.TAG_PROMPT_HOME_V1);
   assert.equal(homeBody.generationConfig.responseSchema, home.tagSchema);
@@ -332,8 +334,9 @@ test("no --domain: every pin is tagged with its board's domain; records carry do
   assert.deepEqual(s.byDomain, { fashion: { tagged: 2, failed: 0 }, home: { tagged: 1, failed: 0 } });
   const byId = Object.fromEntries(readJsonl(outPath).map((r) => [r.pin_id, r]));
   assert.equal(byId.f1.domain, "fashion");
-  assert.equal(byId.f1.prompt_version, "fashion.tag.v1");
+  assert.equal(byId.f1.prompt_version, "fashion.tag.v2", "each domain runs at its own default: fashion v2");
   assert.ok(validateTag(byId.f1.tag).ok);
+  assert.ok(validateTagV2(byId.f1.tag).ok);
   assert.equal(byId.s1.domain, "fashion");
   assert.equal(byId.h1.domain, "home");
   assert.equal(byId.h1.board, "for-the-home");
@@ -380,7 +383,7 @@ test("--only-missing keys on (pin_id, domain): the same pin can be tagged once p
   const outPath = path.join(dir, "tags.jsonl");
   const first = await tagPins({ inPath, outPath, boardsPath, mock: true, log: quiet });
   assert.equal(first.tagged, 2);
-  assert.deepEqual([...taggedKeys(outPath)].sort(), ["fashion\u0000fashion.tag.v1\u0000p1", "home\u0000home.tag.v1\u0000h1"]);
+  assert.deepEqual([...taggedKeys(outPath)].sort(), ["fashion\u0000fashion.tag.v2\u0000p1", "home\u0000home.tag.v1\u0000h1"]);
   // Re-tag p1 under the other domain: its fashion record does not count as done for home.
   writePins([pin("p1", { domain: "home" }), pin("h1", { board: "for-the-home" })]);
   const second = await tagPins({ inPath, outPath, boardsPath, mock: true, onlyMissing: true, log: quiet });
@@ -420,28 +423,46 @@ test("live path for a home pin sends the home prompt + schema and validates with
 
 // --- Prompt versions ---------------------------------------------------------------
 
-test("resolveVersion: v1 is the module-level contract, fashion has v2, home does not, unknown versions throw", () => {
-  assert.equal(DEFAULT_PROMPT_VERSION, "v1");
-  const v1 = resolveVersion("fashion");
+test("resolveVersion: each domain's default is its module-level contract (fashion v2, home v1); v1 stays selectable; unknown versions throw", () => {
+  assert.equal(defaultPromptVersion("fashion"), "v2");
+  assert.equal(defaultPromptVersion("home"), "v1");
+  assert.throws(() => defaultPromptVersion("garden"), /unknown domain 'garden'/);
+  const def = resolveVersion("fashion");
+  assert.equal(def.PROMPT_VERSION, "fashion.tag.v2");
+  assert.equal(def.TAG_PROMPT, TAG_PROMPT_FASHION_V2);
+  assert.equal(def, VERSIONS.v2);
+  assert.equal(resolveVersion("fashion", null), VERSIONS.v2, "null means the domain's default");
+  const v1 = resolveVersion("fashion", "v1");
   assert.equal(v1.PROMPT_VERSION, "fashion.tag.v1");
   assert.equal(v1.TAG_PROMPT, TAG_PROMPT_FASHION_V1);
+  assert.equal(v1.tagSchema, tagSchemaV1);
+  assert.equal(v1.validateTag, validateTagV1);
+  assert.deepEqual(v1.FORMULA_IDS, FORMULA_IDS);
   assert.equal(v1, VERSIONS.v1);
   const v2 = resolveVersion("fashion", "v2");
   assert.equal(v2.PROMPT_VERSION, "fashion.tag.v2");
   assert.equal(v2.TAG_PROMPT, TAG_PROMPT_FASHION_V2);
   assert.equal(v2.tagSchema, tagSchemaV2);
   assert.deepEqual(v2.FORMULA_IDS, FORMULA_V2_IDS);
-  const h = resolveVersion("home", "v1");
+  const h = resolveVersion("home");
   assert.equal(h.PROMPT_VERSION, "home.tag.v1");
   assert.equal(h.TAG_PROMPT, home.TAG_PROMPT_HOME_V1);
+  assert.deepEqual(resolveVersion("home", "v1"), h);
   assert.throws(() => resolveVersion("home", "v2"), /domain 'home' has no prompt version 'v2' \(known: v1\)/);
   assert.throws(() => resolveVersion("fashion", "v3"), /domain 'fashion' has no prompt version 'v3' \(known: v1, v2\)/);
   assert.throws(() => resolveVersion("garden", "v1"), /unknown domain 'garden'/);
+  // Rows without a prompt_version predate versioning: they are v1, never the current default.
+  assert.equal(legacyPromptVersion("fashion"), "fashion.tag.v1");
+  assert.equal(legacyPromptVersion("home"), "home.tag.v1");
+  assert.equal(legacyPromptVersion("garden"), null);
 });
 
-test("parseCli --prompt-version: default v1, validated against the domain when one is given", () => {
-  assert.equal(parseCli([]).promptVersion, "v1");
+test("parseCli --prompt-version: no flag means each domain's default; v1 and v2 selectable; validated against the domain when one is given", () => {
+  assert.equal(parseCli([]).promptVersion, null, "null -> resolved per domain at run time (fashion v2, home v1)");
+  assert.equal(parseCli(["--domain", "fashion"]).promptVersion, null);
+  assert.equal(parseCli(["--domain", "fashion", "--prompt-version", "v1"]).promptVersion, "v1", "v1 stays selectable");
   assert.equal(parseCli(["--domain", "fashion", "--prompt-version", "v2"]).promptVersion, "v2");
+  assert.equal(parseCli(["--domain", "home", "--prompt-version", "v1"]).promptVersion, "v1");
   assert.equal(parseCli(["--prompt-version", "v2"]).promptVersion, "v2", "no --domain: checked per pin at run time");
   assert.throws(() => parseCli(["--domain", "home", "--prompt-version", "v2"]), /domain 'home' has no prompt version 'v2'/);
   assert.throws(() => parseCli(["--prompt-version", "latest"]), /--prompt-version must look like v1 or v2/);
@@ -460,7 +481,13 @@ test("mock mode under v2 draws formulas from the v2 enum and validates against t
     assert.deepEqual(t.garments, mockTag(id).garments);
   }
   assert.ok(formulas.size >= 6, `expected varied v2 formulas, got ${formulas.size}`);
-  assert.deepEqual(mockTag("a", "fashion", "v1"), mockTag("a"));
+  assert.deepEqual(mockTag("a", "fashion", "v2"), mockTag("a"), "v2 is the mock default for fashion");
+  assert.deepEqual(mockTag("a", "fashion", null), mockTag("a"));
+  // v1 stays selectable and differs from the default only in the formula enum it draws from.
+  const v1 = mockTag("a", "fashion", "v1");
+  assert.ok(validateTagV1(v1).ok);
+  assert.ok(FORMULA_IDS.includes(v1.formula));
+  assert.deepEqual({ ...v1, formula: null }, { ...mockTag("a"), formula: null });
   assert.throws(() => mockTag("a", "home", "v2"), /domain 'home' has no prompt version 'v2'/);
 });
 
@@ -505,32 +532,65 @@ test("live path under v2 sends the v2 prompt + schema and validates with the v2 
   const s2 = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", apiKey: "test-key", promptVersion: "v2", log: quiet }, { fetchImpl: stale, sleep: noSleep });
   assert.equal(s2.failed, 1);
   assert.match(s2.records[0].error, /^validation: formula invalid: jeans\+tee\+sneaker/);
-  // And the default (v1) request is unchanged.
-  const v1Body = buildRequestBody({ mimeType: "image/png", data: "QUJD" }, "fashion");
+  // The default request is the v2 one; v1 is still buildable on request.
+  const defBody = buildRequestBody({ mimeType: "image/png", data: "QUJD" }, "fashion");
+  assert.equal(defBody.contents[0].parts[0].text, TAG_PROMPT_FASHION_V2);
+  assert.deepEqual(defBody.generationConfig.responseSchema, tagSchemaV2);
+  const v1Body = buildRequestBody({ mimeType: "image/png", data: "QUJD" }, "fashion", "v1");
   assert.equal(v1Body.contents[0].parts[0].text, TAG_PROMPT_FASHION_V1);
-  assert.deepEqual(buildRequestBody({ mimeType: "image/png", data: "QUJD" }, "fashion", "v2").generationConfig.responseSchema, tagSchemaV2);
+  assert.deepEqual(v1Body.generationConfig.responseSchema, tagSchemaV1);
+  assert.deepEqual(v1Body.generationConfig.responseSchema.properties.formula.enum, [...FORMULA_IDS]);
 });
 
-test("--only-missing keys on (pin_id, domain, prompt_version): a v2 re-tag does not collide with v1 rows", async () => {
+test("--prompt-version v1 stays selectable end to end: records carry fashion.tag.v1 and validate against the v1 enum", async () => {
+  const inPath = writePins([pin("p1")]);
+  const outPath = path.join(dir, "tags.jsonl");
+  const s = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, promptVersion: "v1", log: quiet });
+  assert.equal(s.tagged, 1);
+  const [rec] = readJsonl(outPath);
+  assert.equal(rec.prompt_version, "fashion.tag.v1");
+  assert.ok(validateTagV1(rec.tag).ok);
+  assert.deepEqual(rec.tag, mockTag("p1", "fashion", "v1"));
+  assert.match(formatSummary(s), /--prompt-version v1/, "an explicit version is named even when it is not the default");
+  const good = mockTag("seed", "fashion", "v1");
+  const calls = [];
+  const fetchImpl = async (url, init) => { calls.push({ url, init }); return jsonRes(200, geminiResponse(good)); };
+  const live = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", apiKey: "test-key", promptVersion: "v1", log: quiet }, { fetchImpl, sleep: noSleep });
+  assert.equal(live.tagged, 1);
+  const body = JSON.parse(calls[0].init.body);
+  assert.equal(body.contents[0].parts[0].text, TAG_PROMPT_FASHION_V1);
+  assert.deepEqual(body.generationConfig.responseSchema, tagSchemaV1);
+  assert.equal(live.records[0].prompt_version, "fashion.tag.v1");
+});
+
+test("--only-missing keys on (pin_id, domain, prompt_version): existing fashion.tag.v1 rows are NOT done for a default (v2) run", async () => {
   const inPath = writePins([pin("p1"), pin("p2")]);
   const outPath = path.join(dir, "tags.jsonl");
-  const v1 = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, log: quiet });
+  // The first live run's shape: rows tagged under v1.
+  const v1 = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, promptVersion: "v1", log: quiet });
   assert.equal(v1.tagged, 2);
-  // Resuming v1 skips both; a v2 run tags both again; resuming v2 then skips both.
-  const v1Again = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, log: quiet });
+  assert.deepEqual(v1.records.map((r) => r.prompt_version), ["fashion.tag.v1", "fashion.tag.v1"]);
+  // Resuming v1 skips both; a default run (now v2) tags both again; resuming the default then skips both.
+  const v1Again = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, promptVersion: "v1", log: quiet });
   assert.deepEqual([v1Again.tagged, v1Again.skippedBy], [0, { already_tagged: 2 }]);
-  const v2 = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, promptVersion: "v2", log: quiet });
-  assert.equal(v2.tagged, 2, "v1 rows do not count as done for v2");
+  const v2 = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, log: quiet });
+  assert.equal(v2.tagged, 2, "v1 rows do not count as done for the v2 default");
   assert.deepEqual(v2.records.map((r) => r.prompt_version), ["fashion.tag.v2", "fashion.tag.v2"]);
-  const v2Again = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, promptVersion: "v2", log: quiet });
+  const v2Again = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, log: quiet });
   assert.deepEqual([v2Again.tagged, v2Again.skippedBy], [0, { already_tagged: 2 }]);
+  const v2Explicit = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, promptVersion: "v2", log: quiet });
+  assert.deepEqual([v2Explicit.tagged, v2Explicit.skippedBy], [0, { already_tagged: 2 }], "explicit v2 and the default are the same key");
   assert.deepEqual([...taggedKeys(outPath)].sort(), [
     "fashion\u0000fashion.tag.v1\u0000p1", "fashion\u0000fashion.tag.v1\u0000p2",
     "fashion\u0000fashion.tag.v2\u0000p1", "fashion\u0000fashion.tag.v2\u0000p2",
   ]);
   assert.equal(readJsonl(outPath).length, 4, "append-only: v1 rows kept next to v2 rows");
-  // A row with a domain but no prompt_version (first-run shape) counts as that domain's default version.
-  fs.appendFileSync(outPath, JSON.stringify({ pin_id: "p3", board: "my-style", domain: "fashion", model: "mock", tag: mockTag("p3"), error: null, usage: null, cost_usd: null, ms: 1 }) + "\n");
+  // A row with a domain but no prompt_version (pre-versioning shape) counts as v1, never as today's default.
+  fs.appendFileSync(outPath, JSON.stringify({ pin_id: "p3", board: "my-style", domain: "fashion", model: "mock", tag: mockTag("p3", "fashion", "v1"), error: null, usage: null, cost_usd: null, ms: 1 }) + "\n");
   assert.ok(taggedKeys(outPath).has("fashion\u0000fashion.tag.v1\u0000p3"));
   assert.ok(!taggedKeys(outPath).has("fashion\u0000fashion.tag.v2\u0000p3"));
+  writePins([pin("p3")]);
+  const legacy = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, log: quiet });
+  assert.equal(legacy.tagged, 1, "a default (v2) resume re-tags the version-less row");
+  assert.equal(legacy.records[0].prompt_version, "fashion.tag.v2");
 });
