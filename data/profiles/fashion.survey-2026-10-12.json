@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "source": "style-quiz",
+  "artifact": "https://claude.ai/artifact/GMBaAcSLNjz67N3N5i9yWp",
+  "response_id": "r-1791776157984",
+  "submitted_at": "2026-10-12T03:35:57.983Z",
+  "answers": {
+    "uniforms": {"Jeans, a cardigan, a tee": "love", "Jeans, a knit, a necklace": "love", "Jeans, a tee, sneakers": "love", "Sporty clothes as day clothes": "love"},
+    "shapes": ["Relaxed and easy", "Layered", "Loose top, slim bottom"],
+    "neutrals": ["White", "Black", "Grey", "Denim", "Brown", "Beige"],
+    "metal": "Both, I mix",
+    "accents": ["Green", "Burgundy", "Mustard", "Pink", "Olive"],
+    "tt": {"Sneakers / Sandals": "Sandals", "A dress / Jeans": "Jeans", "Necklace / Earrings": "Earrings", "Tote / Crossbody": "Tote", "Layers / One piece": "Layers", "Prints / Solids": "Solids", "Cardigan / Blazer": "Cardigan", "Boots / Loafers": "Boots", "Sunglasses always / Only when sunny": "Sunglasses always", "Tuck it in / Leave it out": "Leave it out"},
+    "days": ["School drop-off and pick-up", "Volunteering at school", "Driving kids to activities", "Yoga or a workout"],
+    "daylook": "Easy but clearly put together",
+    "occasions": ["School events and kid sports", "Date night", "Dinner out with friends", "Yoga or a class"],
+    "nogos": {"Never": ["Animal print", "Big logos", "Bold prints", "Dry-clean only", "Matching sets", "Mini skirts", "Ruffles", "Sequins or sparkle", "Turtlenecks"], "Rarely": ["Crop tops", "Hats", "Leather pieces", "Sheer fabrics", "Shorts", "Tall boots", "Tight or bodycon", "White trousers"], "Happily": ["Anything wool", "Blazers", "Head-to-toe one colour", "Jumpsuits", "Maxi dresses", "Sleeveless", "Statement jewellery", "Trench coats", "Wide-leg trousers"]},
+    "heels": "A dinner out, a couple of hours",
+    "musts": ["Pockets", "Machine washable", "Works with a regular bra", "Nothing itchy"],
+    "temp": "I'm always cold",
+    "time": "Under 5 minutes",
+    "hard": ["Finding the thing I'm picturing", "Nothing feels like me"],
+    "laundry": "A load most days",
+    "daily": ["A necklace", "Earrings", "Rings", "Sunglasses", "Not much, honestly"],
+    "shoes": ["Sneakers", "Sandals", "Flip-flops"],
+    "bag": "Shoulder bag",
+    "help": ["Tomorrow's outfit, picked the night before", "Using more of what I already own"],
+    "feel": ["Effortless", "Comfortable", "Playful"],
+    "notes": "",
+    "else": {}
+  }
+}
