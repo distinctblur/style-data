@@ -5,9 +5,12 @@ import os from "node:os";
 import path from "node:path";
 import {
   TAG_PROMPT_V1, PROMPT_VERSION, MAX_IMAGE_BYTES, DEFAULT_BOARDS_PATH, mockTag, tagPins, callGemini, costUsd, parseCli, formatSummary,
-  readJsonl, buildRequestBody, loadBoardDomains, pinDomain, taggedKeys,
+  readJsonl, buildRequestBody, loadBoardDomains, pinDomain, taggedKeys, resolveVersion, DEFAULT_PROMPT_VERSION,
 } from "../tag.mjs";
-import { validateTag, CATEGORIES, FORMULA_IDS, COLOURS, PROMPT_VERSION as FASHION_PROMPT_VERSION, TAG_PROMPT_FASHION_V1 } from "../taxonomies/fashion.mjs";
+import {
+  validateTag, validateTagV2, CATEGORIES, FORMULA_IDS, FORMULA_V2_IDS, COLOURS, PROMPT_VERSION as FASHION_PROMPT_VERSION,
+  TAG_PROMPT_FASHION_V1, TAG_PROMPT_FASHION_V2, tagSchemaV2, VERSIONS,
+} from "../taxonomies/fashion.mjs";
 import * as home from "../taxonomies/home.mjs";
 import { getDomain } from "../taxonomies/index.mjs";
 
@@ -259,7 +262,7 @@ test("costUsd and parseCli", () => {
   assert.equal(costUsd({ promptTokenCount: 0, candidatesTokenCount: 1e6, thoughtsTokenCount: 1e6 }, 0.5, 3), 6);
 
   const o = parseCli(["--domain", "home", "--boards", "b.json", "--in", "a.jsonl", "--out", "b.jsonl", "--limit", "5", "--concurrency", "2", "--only-missing", "--mock", "--price-in", "0.5", "--price-out", "3"]);
-  assert.deepEqual(o, { domain: "home", boardsPath: "b.json", inPath: "a.jsonl", outPath: "b.jsonl", limit: 5, model: "gemini-3.6-flash", concurrency: 2, onlyMissing: true, mock: true, priceIn: 0.5, priceOut: 3 });
+  assert.deepEqual(o, { domain: "home", boardsPath: "b.json", inPath: "a.jsonl", outPath: "b.jsonl", limit: 5, model: "gemini-3.6-flash", concurrency: 2, onlyMissing: true, mock: true, priceIn: 0.5, priceOut: 3, promptVersion: "v1" });
   const d = parseCli([]);
   assert.equal(d.domain, null, "no --domain: every pin is tagged with its board's domain");
   assert.equal(d.boardsPath, DEFAULT_BOARDS_PATH);
@@ -377,7 +380,7 @@ test("--only-missing keys on (pin_id, domain): the same pin can be tagged once p
   const outPath = path.join(dir, "tags.jsonl");
   const first = await tagPins({ inPath, outPath, boardsPath, mock: true, log: quiet });
   assert.equal(first.tagged, 2);
-  assert.deepEqual([...taggedKeys(outPath)].sort(), ["fashion\u0000p1", "home\u0000h1"]);
+  assert.deepEqual([...taggedKeys(outPath)].sort(), ["fashion\u0000fashion.tag.v1\u0000p1", "home\u0000home.tag.v1\u0000h1"]);
   // Re-tag p1 under the other domain: its fashion record does not count as done for home.
   writePins([pin("p1", { domain: "home" }), pin("h1", { board: "for-the-home" })]);
   const second = await tagPins({ inPath, outPath, boardsPath, mock: true, onlyMissing: true, log: quiet });
@@ -413,4 +416,121 @@ test("live path for a home pin sends the home prompt + schema and validates with
   const s2 = await tagPins({ inPath, outPath, boardsPath, apiKey: "test-key", log: quiet }, { fetchImpl: wrong, sleep: noSleep });
   assert.equal(s2.failed, 1);
   assert.match(s2.records[0].error, /^validation: missing field: is_interior/);
+});
+
+// --- Prompt versions ---------------------------------------------------------------
+
+test("resolveVersion: v1 is the module-level contract, fashion has v2, home does not, unknown versions throw", () => {
+  assert.equal(DEFAULT_PROMPT_VERSION, "v1");
+  const v1 = resolveVersion("fashion");
+  assert.equal(v1.PROMPT_VERSION, "fashion.tag.v1");
+  assert.equal(v1.TAG_PROMPT, TAG_PROMPT_FASHION_V1);
+  assert.equal(v1, VERSIONS.v1);
+  const v2 = resolveVersion("fashion", "v2");
+  assert.equal(v2.PROMPT_VERSION, "fashion.tag.v2");
+  assert.equal(v2.TAG_PROMPT, TAG_PROMPT_FASHION_V2);
+  assert.equal(v2.tagSchema, tagSchemaV2);
+  assert.deepEqual(v2.FORMULA_IDS, FORMULA_V2_IDS);
+  const h = resolveVersion("home", "v1");
+  assert.equal(h.PROMPT_VERSION, "home.tag.v1");
+  assert.equal(h.TAG_PROMPT, home.TAG_PROMPT_HOME_V1);
+  assert.throws(() => resolveVersion("home", "v2"), /domain 'home' has no prompt version 'v2' \(known: v1\)/);
+  assert.throws(() => resolveVersion("fashion", "v3"), /domain 'fashion' has no prompt version 'v3' \(known: v1, v2\)/);
+  assert.throws(() => resolveVersion("garden", "v1"), /unknown domain 'garden'/);
+});
+
+test("parseCli --prompt-version: default v1, validated against the domain when one is given", () => {
+  assert.equal(parseCli([]).promptVersion, "v1");
+  assert.equal(parseCli(["--domain", "fashion", "--prompt-version", "v2"]).promptVersion, "v2");
+  assert.equal(parseCli(["--prompt-version", "v2"]).promptVersion, "v2", "no --domain: checked per pin at run time");
+  assert.throws(() => parseCli(["--domain", "home", "--prompt-version", "v2"]), /domain 'home' has no prompt version 'v2'/);
+  assert.throws(() => parseCli(["--prompt-version", "latest"]), /--prompt-version must look like v1 or v2/);
+});
+
+test("mock mode under v2 draws formulas from the v2 enum and validates against the v2 schema", () => {
+  const ids = Array.from({ length: 60 }, (_, i) => `pin-${i}`);
+  const formulas = new Set();
+  for (const id of ids) {
+    const t = mockTag(id, "fashion", "v2");
+    assert.deepEqual(mockTag(id, "fashion", "v2"), t, "deterministic");
+    assert.ok(validateTagV2(t).ok, validateTagV2(t).errors.join("; "));
+    assert.ok(FORMULA_V2_IDS.includes(t.formula));
+    formulas.add(t.formula);
+    // Same pin, same garments under both versions; only the formula enum differs.
+    assert.deepEqual(t.garments, mockTag(id).garments);
+  }
+  assert.ok(formulas.size >= 6, `expected varied v2 formulas, got ${formulas.size}`);
+  assert.deepEqual(mockTag("a", "fashion", "v1"), mockTag("a"));
+  assert.throws(() => mockTag("a", "home", "v2"), /domain 'home' has no prompt version 'v2'/);
+});
+
+test("--prompt-version v2: records carry fashion.tag.v2, mock tags are v2-valid, summary names the version", async () => {
+  const inPath = writePins([pin("p1"), pin("p2")]);
+  const outPath = path.join(dir, "tags.jsonl");
+  const s = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, promptVersion: "v2", log: quiet });
+  assert.equal(s.tagged, 2);
+  assert.equal(s.promptVersion, "v2");
+  for (const r of readJsonl(outPath)) {
+    assert.equal(r.prompt_version, "fashion.tag.v2");
+    assert.equal(r.domain, "fashion");
+    assert.ok(validateTagV2(r.tag).ok);
+    assert.deepEqual(r.tag, mockTag(r.pin_id, "fashion", "v2"));
+  }
+  assert.match(formatSummary(s), /--prompt-version v2/);
+  assert.doesNotMatch(formatSummary(await tagPins({ inPath, outPath: path.join(dir, "t1.jsonl"), boardsPath, domain: "fashion", mock: true, log: quiet })), /--prompt-version/);
+  // A v2 run that meets a home pin fails fast rather than silently tagging it with v1.
+  const mixed = writePins([pin("f1"), pin("h1", { board: "for-the-home" })], "mixed.jsonl");
+  await assert.rejects(() => tagPins({ inPath: mixed, outPath, boardsPath, mock: true, promptVersion: "v2", log: quiet }), /domain 'home' has no prompt version 'v2'/);
+  await assert.rejects(() => tagPins({ inPath, outPath, boardsPath, domain: "home", mock: true, promptVersion: "v2", log: quiet }), /domain 'home' has no prompt version 'v2'/);
+});
+
+test("live path under v2 sends the v2 prompt + schema and validates with the v2 enum", async () => {
+  const good = mockTag("seed", "fashion", "v2");
+  const calls = [];
+  const fetchImpl = async (url, init) => { calls.push({ url, init }); return jsonRes(200, geminiResponse(good)); };
+  const inPath = writePins([pin("p1")]);
+  const outPath = path.join(dir, "tags.jsonl");
+  const s = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", apiKey: "test-key", promptVersion: "v2", log: quiet }, { fetchImpl, sleep: noSleep });
+  assert.equal(s.mode, "live");
+  assert.equal(s.tagged, 1);
+  const body = JSON.parse(calls[0].init.body);
+  assert.equal(body.contents[0].parts[0].text, TAG_PROMPT_FASHION_V2);
+  assert.deepEqual(body.generationConfig.responseSchema, tagSchemaV2);
+  assert.deepEqual(body.generationConfig.responseSchema.properties.formula.enum, [...FORMULA_V2_IDS]);
+  const [rec] = s.records;
+  assert.equal(rec.prompt_version, "fashion.tag.v2");
+  assert.deepEqual(rec.tag, good);
+  // A v1-only formula in the reply fails v2 validation.
+  const stale = async () => jsonRes(200, geminiResponse({ ...good, formula: "jeans+tee+sneaker" }));
+  const s2 = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", apiKey: "test-key", promptVersion: "v2", log: quiet }, { fetchImpl: stale, sleep: noSleep });
+  assert.equal(s2.failed, 1);
+  assert.match(s2.records[0].error, /^validation: formula invalid: jeans\+tee\+sneaker/);
+  // And the default (v1) request is unchanged.
+  const v1Body = buildRequestBody({ mimeType: "image/png", data: "QUJD" }, "fashion");
+  assert.equal(v1Body.contents[0].parts[0].text, TAG_PROMPT_FASHION_V1);
+  assert.deepEqual(buildRequestBody({ mimeType: "image/png", data: "QUJD" }, "fashion", "v2").generationConfig.responseSchema, tagSchemaV2);
+});
+
+test("--only-missing keys on (pin_id, domain, prompt_version): a v2 re-tag does not collide with v1 rows", async () => {
+  const inPath = writePins([pin("p1"), pin("p2")]);
+  const outPath = path.join(dir, "tags.jsonl");
+  const v1 = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, log: quiet });
+  assert.equal(v1.tagged, 2);
+  // Resuming v1 skips both; a v2 run tags both again; resuming v2 then skips both.
+  const v1Again = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, log: quiet });
+  assert.deepEqual([v1Again.tagged, v1Again.skippedBy], [0, { already_tagged: 2 }]);
+  const v2 = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, promptVersion: "v2", log: quiet });
+  assert.equal(v2.tagged, 2, "v1 rows do not count as done for v2");
+  assert.deepEqual(v2.records.map((r) => r.prompt_version), ["fashion.tag.v2", "fashion.tag.v2"]);
+  const v2Again = await tagPins({ inPath, outPath, boardsPath, domain: "fashion", mock: true, onlyMissing: true, promptVersion: "v2", log: quiet });
+  assert.deepEqual([v2Again.tagged, v2Again.skippedBy], [0, { already_tagged: 2 }]);
+  assert.deepEqual([...taggedKeys(outPath)].sort(), [
+    "fashion\u0000fashion.tag.v1\u0000p1", "fashion\u0000fashion.tag.v1\u0000p2",
+    "fashion\u0000fashion.tag.v2\u0000p1", "fashion\u0000fashion.tag.v2\u0000p2",
+  ]);
+  assert.equal(readJsonl(outPath).length, 4, "append-only: v1 rows kept next to v2 rows");
+  // A row with a domain but no prompt_version (first-run shape) counts as that domain's default version.
+  fs.appendFileSync(outPath, JSON.stringify({ pin_id: "p3", board: "my-style", domain: "fashion", model: "mock", tag: mockTag("p3"), error: null, usage: null, cost_usd: null, ms: 1 }) + "\n");
+  assert.ok(taggedKeys(outPath).has("fashion\u0000fashion.tag.v1\u0000p3"));
+  assert.ok(!taggedKeys(outPath).has("fashion\u0000fashion.tag.v2\u0000p3"));
 });

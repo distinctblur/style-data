@@ -8,6 +8,8 @@ import { fileURLToPath } from "node:url";
 
 import { aggregate, parseJsonl, nearestHue, NEUTRALS, summaryLines } from "../aggregate.mjs";
 import { combinations } from "../aggregate-fashion.mjs";
+import { assignFormula } from "../formula-assign.mjs";
+import { FORMULA_V2_IDS } from "../taxonomies/fashion.mjs";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPT = path.join(DIR, "..", "aggregate.mjs");
@@ -221,8 +223,40 @@ test("min-confidence threshold is respected", () => {
   assert.ok(loose.overall.palette.accent.some((c) => c.colour === "red") || loose.overall.palette.secondary.some((c) => c.colour === "red"));
 });
 
-test("summary is 16 lines", () => {
-  assert.equal(summaryLines(run()).length, 16);
+test("summary is 17 lines and names both formula lists", () => {
+  const lines = summaryLines(run());
+  assert.equal(lines.length, 17);
+  assert.match(lines[4], /^formulas: /);
+  assert.match(lines[5], /^formulas v2: .*\(coverage \d+%\)$/);
+});
+
+test("formula_weights_v2: assigned from garments, sums to 1, coverage = 1 - other share, per board and overall", () => {
+  const p = run();
+  for (const scope of [p.overall, p.boards["my-style"], p.boards["swim-look"]]) {
+    approx(sumW(scope.formula_weights_v2), 1);
+    assert.ok(scope.formula_v2_coverage >= 0 && scope.formula_v2_coverage <= 1);
+    const other = scope.formula_weights_v2.find((r) => r.formula === "other")?.weight ?? 0;
+    approx(scope.formula_v2_coverage, 1 - other, 1e-3);
+    for (const r of scope.formula_weights_v2) {
+      assert.ok(FORMULA_V2_IDS.includes(r.formula), `unknown v2 formula ${r.formula}`);
+      assert.ok(Number.isInteger(r.count) && r.count >= 1);
+    }
+    assert.equal(scope.formula_weights_v2.reduce((a, r) => a + r.count, 0), scope.pins_used);
+  }
+  // The model's v1 answer is untouched next to it.
+  assert.ok(p.overall.formula_weights.some((r) => r.formula === "slip-dress+sandal"));
+  const keys = Object.keys(p.overall);
+  assert.deepEqual(keys.slice(keys.indexOf("formula_weights"), keys.indexOf("formula_weights") + 3), ["formula_weights", "formula_weights_v2", "formula_v2_coverage"]);
+  // Counts agree with assignFormula over the used fixture pins (same garments, same matcher).
+  const expect = {};
+  for (const t of TAGS) {
+    if (!t.tag || t.tag.confidence < 0.5 || t.tag.is_outfit === false) continue;
+    const f = assignFormula(t.tag.garments).formula;
+    expect[f] = (expect[f] ?? 0) + 1;
+  }
+  assert.deepEqual(Object.fromEntries(p.overall.formula_weights_v2.map((r) => [r.formula, r.count])), expect);
+  // The fixture's repeated blazer + wide-leg trouser + loafer looks keep their brief formula under v2.
+  assert.ok(p.overall.formula_weights_v2.some((r) => r.formula === "blazer+wide-leg-trouser+loafer"));
 });
 
 test("CLI writes the profile and prints a summary to stderr", () => {

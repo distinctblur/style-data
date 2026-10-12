@@ -4,6 +4,7 @@ import {
   CATEGORIES, SUBCATEGORIES, ALL_SUBCATEGORIES, SUBCATEGORY_TO_CATEGORY, COLOURS, NEUTRALS, PATTERNS, FABRICS,
   FORMALITY, FORMALITY_LEVELS, SEASONS, WARMTH, FORMULAS, FORMULA_IDS, SILHOUETTES, OCCASIONS,
   garmentSchema, tagSchema, validateTag, DOMAIN, PROMPT_VERSION, TAG_PROMPT, TAG_PROMPT_FASHION_V1,
+  FORMULAS_V2, FORMULA_V2_IDS, FORMULA_V2_LINES, describeFormulaV2, tagSchemaV2, validateTagV2, TAG_PROMPT_FASHION_V2, PROMPT_VERSION_V2, VERSIONS,
 } from "../taxonomies/fashion.mjs";
 import { DOMAINS, DOMAIN_NAMES, getDomain } from "../taxonomies/index.mjs";
 
@@ -143,4 +144,78 @@ test("domain registry: every domain exports the same interface; unknown names th
   }
   assert.throws(() => getDomain("garden"), /unknown domain 'garden' \(known: fashion, home\)/);
   assert.throws(() => getDomain(undefined), /unknown domain/);
+});
+
+// --- v2 formulas (docs/formula-v2-proposal.md) ---------------------------------------
+
+test("FORMULAS_V2: ids unique, 14-22 formulas plus 'other', the brief's three kept, slots well-formed over known ids", () => {
+  assert.ok(unique(FORMULA_V2_IDS), "v2 ids must be unique");
+  assert.ok(FORMULA_V2_IDS.includes("other"));
+  assert.equal(FORMULAS_V2.at(-1).id, "other", "'other' is last so list-order tie-breaks never pick it");
+  const real = FORMULAS_V2.filter((f) => f.id !== "other");
+  assert.ok(real.length >= 14 && real.length <= 22, `expected 14-22 formulas, got ${real.length}`);
+  for (const id of ["blazer+wide-leg-trouser+loafer", "midi-skirt+fitted-top", "knit+trouser+loafer", "athleisure"]) {
+    assert.ok(FORMULA_V2_IDS.includes(id), `v2 must keep ${id}`);
+  }
+  const known = new Set([...CATEGORIES, ...ALL_SUBCATEGORIES]);
+  for (const f of real) {
+    assert.match(f.id, /^[a-z0-9+-]+$/, `${f.id}: id must be a lowercase slug`);
+    assert.ok(f.slots.length >= 1 && f.slots.length <= 5, `${f.id}: 1-5 slots`);
+    assert.ok(f.slots.some((sl) => sl.required), `${f.id}: at least one required slot`);
+    assert.ok(unique(f.slots.map((sl) => sl.name)), `${f.id}: slot names unique`);
+    for (const sl of f.slots) {
+      assert.equal(typeof sl.name, "string");
+      assert.equal(typeof sl.required, "boolean");
+      assert.ok(Array.isArray(sl.any) && sl.any.length >= 1, `${f.id}.${sl.name}: any[] non-empty`);
+      assert.ok(unique(sl.any), `${f.id}.${sl.name}: duplicate ids`);
+      for (const id of sl.any) assert.ok(known.has(id), `${f.id}.${sl.name}: unknown id ${id}`);
+    }
+  }
+  assert.ok(Object.isFrozen(FORMULAS_V2) && Object.isFrozen(FORMULAS_V2[0].slots[0].any));
+  // Every v2 formula is readable in one line for the prompt and the proposal.
+  assert.equal(FORMULA_V2_LINES.length, FORMULAS_V2.length);
+  assert.match(describeFormulaV2(FORMULAS_V2[0]), /^[a-z0-9+-]+ = .+ \(\+ .+\)$/);
+  assert.equal(describeFormulaV2(FORMULAS_V2.at(-1)), "other = none of the above");
+});
+
+test("v2 schema, prompt and version: enum = v2 ids, prompt names every v2 id and the layering rule, v1 untouched", () => {
+  assert.deepEqual(tagSchemaV2.properties.formula.enum, [...FORMULA_V2_IDS]);
+  assert.deepEqual(tagSchema.properties.formula.enum, [...FORMULA_IDS], "v1 schema keeps the v1 enum");
+  assert.equal(tagSchemaV2.properties.garments.items, garmentSchema);
+  const { formula: f2, ...restV2 } = tagSchemaV2.properties;
+  const { formula: f1, ...restV1 } = tagSchema.properties;
+  assert.deepEqual(restV2, restV1, "v2 differs from v1 only in the formula enum");
+  assert.equal(PROMPT_VERSION_V2, "fashion.tag.v2");
+  assert.equal(PROMPT_VERSION, "fashion.tag.v1", "the default stays v1 until the review");
+  assert.equal(TAG_PROMPT, TAG_PROMPT_FASHION_V1);
+  for (const id of FORMULA_V2_IDS) assert.ok(TAG_PROMPT_FASHION_V2.includes(id), `v2 prompt lacks ${id}`);
+  for (const line of FORMULA_V2_LINES) assert.ok(TAG_PROMPT_FASHION_V2.includes(line), `v2 prompt lacks slot line ${line}`);
+  assert.match(TAG_PROMPT_FASHION_V2, /Layering accessories count toward the formula/);
+  assert.match(TAG_PROMPT_FASHION_V2, /set is_outfit=false and still tag visible garments/);
+  for (const c of COLOURS) assert.ok(TAG_PROMPT_FASHION_V2.includes(c), `v2 prompt lacks colour ${c}`);
+  // v1-only ids are not offered by the v2 prompt's formula list.
+  const v2FormulaBlock = TAG_PROMPT_FASHION_V2.slice(TAG_PROMPT_FASHION_V2.indexOf("- formula:"), TAG_PROMPT_FASHION_V2.indexOf("- silhouette:"));
+  for (const id of ["jeans+tee+sneaker", "tonal-monochrome", "matching-set"]) assert.ok(!v2FormulaBlock.includes(`${id} =`), `v2 prompt still lists ${id}`);
+  assert.deepEqual(Object.keys(VERSIONS), ["v1", "v2"]);
+  assert.equal(VERSIONS.v1.TAG_PROMPT, TAG_PROMPT_FASHION_V1);
+  assert.equal(VERSIONS.v1.tagSchema, tagSchema);
+  assert.equal(VERSIONS.v2.PROMPT_VERSION, PROMPT_VERSION_V2);
+  assert.equal(VERSIONS.v2.tagSchema, tagSchemaV2);
+  assert.deepEqual(VERSIONS.v2.FORMULA_IDS, FORMULA_V2_IDS);
+});
+
+test("validateTag accepts v2 ids only under version v2; validateTagV2 is that shortcut", () => {
+  const v2 = { ...goodTag(), formula: "jeans+cardigan+tee" };
+  assert.equal(validateTag(v2).ok, false, "a v2 id is not a v1 id");
+  assert.deepEqual(validateTag(v2, { version: "v2" }), { ok: true, errors: [] });
+  assert.deepEqual(validateTagV2(v2), { ok: true, errors: [] });
+  assert.equal(VERSIONS.v2.validateTag(v2).ok, true);
+  const v1Only = { ...goodTag(), formula: "jeans+tee+sneaker" };
+  assert.equal(validateTag(v1Only).ok, true);
+  assert.ok(validateTagV2(v1Only).errors.some((e) => /formula invalid: jeans\+tee\+sneaker/.test(e)));
+  assert.equal(validateTagV2(goodTag()).ok, true, "the brief's blazer formula is kept in v2");
+  assert.equal(validateTagV2({ ...goodTag(), formula: "other" }).ok, true);
+  assert.throws(() => validateTag(goodTag(), { version: "v9" }), /unknown version 'v9'/);
+  // Everything else is validated the same way under v2.
+  assert.ok(validateTagV2({ ...v2, formality: 7 }).errors.some((e) => /formality/.test(e)));
 });

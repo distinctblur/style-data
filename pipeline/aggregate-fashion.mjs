@@ -1,13 +1,16 @@
 // style-data — fashion domain summariser for aggregate.mjs (Atelier D10 seed input).
 //
 // Used set: tag non-null, confidence >= threshold, is_outfit !== false. Emits
-// formula_weights, silhouettes, formality histogram/mean, seasons, occasions,
+// formula_weights (the model's v1 answer), formula_weights_v2 (FORMULAS_V2
+// assigned deterministically from each pin's garments by formula-assign.mjs,
+// with formula_v2_coverage = 1 - the `other` share), silhouettes, formality histogram/mean, seasons, occasions,
 // palette (neutrals / secondary / accent), dominant_colors (pins' dominant hex
 // bucketed to named hues), garment_mix, subcategory_top, vibe_keywords_top and
 // absences. Tag strings are opaque; the neutral set comes from the fashion
 // taxonomy and the absence candidates below match loosely.
 
 import { NEUTRALS as TAXONOMY_NEUTRALS } from "./taxonomies/fashion.mjs";
+import { assignFormula } from "./formula-assign.mjs";
 import { Counter, buildProfile, r4, splitPalette, scanAbsences } from "./aggregate.mjs";
 
 // Brief §2.3: base neutrals are the 60–70% layer. The taxonomy is the single
@@ -78,7 +81,7 @@ export const ABSENCE_CANDIDATES = {
   ],
   categories: [
     { label: "cropped tops", match: ["crop", "cropped"] },
-    { label: "shorts", match: ["short"] },
+    { label: "shorts", match: ["short", "shorts"] },
     { label: "mini skirts", match: ["mini skirt", "mini"] },
     { label: "sneakers / trainers", match: ["sneaker", "trainer"] },
     { label: "heels", match: ["heel", "pump", "stiletto"] },
@@ -133,6 +136,7 @@ export const aggregate = aggregateFashion;
 
 function summarise(rows) {
   const formulas = new Counter();
+  const formulasV2 = new Counter();
   const silhouettes = new Counter();
   const formality = new Counter();
   const seasons = new Counter();
@@ -162,6 +166,7 @@ function summarise(rows) {
     const t = r.tag;
     totalWeight += w;
     formulas.add(t.formula, w);
+    formulasV2.add(assignFormula(t.garments).formula, w);
     silhouettes.add(t.silhouette, w);
     seasons.add(t.season, w);
     occasions.add(t.occasion, w);
@@ -212,6 +217,8 @@ function summarise(rows) {
     pins_used: rows.length,
     weight_total: r4(totalWeight),
     formula_weights: formulas.rows("formula"),
+    formula_weights_v2: formulasV2.rows("formula"),
+    formula_v2_coverage: r4(1 - (formulasV2.total() ? (formulasV2.map.get("other")?.weight ?? 0) / formulasV2.total() : 0)),
     silhouettes: silhouettes.rows("silhouette"),
     formality_histogram: hist,
     formality_mean: fWeightSum ? r4(fWeighted / fWeightSum) : null,
@@ -247,6 +254,7 @@ export function summaryLines(profile) {
     `dates ${c.date_min ?? "?"} → ${c.date_max ?? "?"}, half-life ${c.half_life_days}d, min confidence ${c.min_confidence}`,
     `boards: ${c.boards.map((b) => `${b} (${profile.boards[b].pins_used})`).join(", ") || "—"}`,
     `formulas: ${top(o.formula_weights, "formula")}`,
+    `formulas v2: ${top(o.formula_weights_v2, "formula", 4)} (coverage ${(o.formula_v2_coverage * 100).toFixed(0)}%)`,
     `combos: ${top(o.garment_combos_top.triples, "combo")}`,
     `silhouettes: ${top(o.silhouettes, "silhouette")}`,
     `formality mean ${o.formality_mean ?? "—"}; histogram ${["1", "2", "3", "4", "5"].map((l) => `${l}:${(o.formality_histogram[l].weight * 100).toFixed(0)}%`).join(" ")}`,

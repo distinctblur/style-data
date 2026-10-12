@@ -3,7 +3,8 @@
 //
 //   node pipeline/tag.mjs [--domain fashion|home] [--in data/pins.jsonl] [--out data/tags.jsonl] \
 //        [--boards boards.json] [--limit N] [--model gemini-3.6-flash] [--concurrency 4] \
-//        [--only-missing] [--mock] [--price-in USD_PER_MTOK] [--price-out USD_PER_MTOK]
+//        [--only-missing] [--mock] [--price-in USD_PER_MTOK] [--price-out USD_PER_MTOK] \
+//        [--prompt-version v1|v2]
 //
 // DOMAIN ROUTING: each pin's domain is its own `domain` field if present, else
 // the `domain` of its `board` in boards.json. With no --domain every pin is
@@ -17,7 +18,14 @@
 // responseSchema (the pattern proven in studio/src/rerank.ts — never hedge
 // between config shapes). Output is one JSON record per pin, appended to --out,
 // carrying `domain` and the domain's `prompt_version`; `--only-missing` resumes
-// by skipping (pin_id, domain) pairs that already have a successful record.
+// by skipping (pin_id, domain, prompt_version) triples that already have a
+// successful record, so a later re-tag under a new prompt version never
+// collides with the old rows.
+//
+// PROMPT VERSIONS: `--prompt-version v1|v2` (default v1) selects one of the
+// domain module's `VERSIONS` entries (prompt, responseSchema, validator and
+// `PROMPT_VERSION` string). Today only fashion has a v2 (FORMULAS_V2, pending
+// the human prompt review); asking for a version a domain lacks fails fast.
 //
 // MOCK MODE: with `--mock`, or when no GEMINI_API_KEY resolves (env, then
 // ./.dev.vars), every pin gets a deterministic, schema-valid tag for its domain
@@ -38,6 +46,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
 
 export const DEFAULT_DOMAIN = "fashion";
+export const DEFAULT_PROMPT_VERSION = "v1";
 export const DEFAULT_MODEL = "gemini-3.6-flash";
 export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 export const REQUEST_TIMEOUT_MS = 60_000;
@@ -61,6 +70,27 @@ export function resolveApiKey(env = process.env) {
   } catch {
     return null;
   }
+}
+
+// --- Prompt versions ---------------------------------------------------------------
+
+/**
+ * The tagging contract {PROMPT_VERSION, TAG_PROMPT, tagSchema, validateTag,
+ * FORMULA_IDS?} of a domain at a prompt version. "v1" is every domain's
+ * module-level exports; later versions come from the module's `VERSIONS` map.
+ * @param {string} domain
+ * @param {string} [promptVersion="v1"]
+ * @throws {Error} when the domain has no such version
+ */
+export function resolveVersion(domain, promptVersion = DEFAULT_PROMPT_VERSION) {
+  const d = getDomain(domain);
+  const v = d.VERSIONS?.[promptVersion];
+  if (v) return v;
+  if (promptVersion === DEFAULT_PROMPT_VERSION) {
+    return { PROMPT_VERSION: d.PROMPT_VERSION, TAG_PROMPT: d.TAG_PROMPT, tagSchema: d.tagSchema, validateTag: d.validateTag, FORMULA_IDS: d.FORMULA_IDS };
+  }
+  const known = Object.keys(d.VERSIONS ?? { v1: 1 }).join(", ");
+  throw new Error(`domain '${domain}' has no prompt version '${promptVersion}' (known: ${known})`);
 }
 
 // --- Domain routing -------------------------------------------------------------
@@ -103,8 +133,9 @@ function pickDistinct(h, xs, n, seed) {
 const MOCK_FASHION_VIBES = ["minimal", "coastal", "tailored", "boho", "polished", "sporty", "relaxed", "preppy", "romantic", "edgy", "classic", "tonal"];
 const MOCK_HOME_VIBES = ["warm", "layered", "airy", "textured", "cosy", "sculptural", "calm", "organic", "graphic", "moody", "sunlit", "collected"];
 
-function mockFashionTag(pinId) {
+function mockFashionTag(pinId, promptVersion = DEFAULT_PROMPT_VERSION) {
   const F = DOMAINS.fashion;
+  const V = resolveVersion("fashion", promptVersion);
   const h = hashOf(pinId);
   const pick = pickFrom(h);
   const nGarments = 2 + (h[2] % 3);
@@ -123,7 +154,7 @@ function mockFashionTag(pinId) {
   return {
     is_outfit: h[0] % 5 !== 0,
     garments,
-    formula: pick(F.FORMULA_IDS, 1),
+    formula: pick(V.FORMULA_IDS, 1),
     silhouette: pick(F.SILHOUETTES, 5),
     formality: 1 + (h[6] % 5),
     season: pick(F.SEASONS, 7),
@@ -167,22 +198,24 @@ const MOCKS = { fashion: mockFashionTag, home: mockHomeTag };
  * Deterministic, schema-valid tag for the domain, derived from sha256(pin_id).
  * @param {string} pinId
  * @param {string} [domain="fashion"]
+ * @param {string} [promptVersion="v1"]  the formula enum the mock draws from
  */
-export function mockTag(pinId, domain = DEFAULT_DOMAIN) {
+export function mockTag(pinId, domain = DEFAULT_DOMAIN, promptVersion = DEFAULT_PROMPT_VERSION) {
   getDomain(domain); // throws for unknown
+  resolveVersion(domain, promptVersion); // throws for a version the domain lacks
   const fn = MOCKS[domain];
   if (!fn) throw new Error(`no mock tag generator for domain '${domain}'`);
-  return fn(pinId);
+  return fn(pinId, promptVersion);
 }
 
 // --- Gemini call ----------------------------------------------------------------
 
-/** generateContent body: the domain's prompt + the image, structured output via the domain's responseSchema. */
-export function buildRequestBody(image, domain = DEFAULT_DOMAIN) {
-  const d = getDomain(domain);
+/** generateContent body: the domain's prompt (at the prompt version) + the image, structured output via that version's responseSchema. */
+export function buildRequestBody(image, domain = DEFAULT_DOMAIN, promptVersion = DEFAULT_PROMPT_VERSION) {
+  const v = resolveVersion(domain, promptVersion);
   return {
-    contents: [{ role: "user", parts: [{ text: d.TAG_PROMPT }, { inlineData: { mimeType: image.mimeType, data: image.data } }] }],
-    generationConfig: { responseMimeType: "application/json", responseSchema: d.tagSchema },
+    contents: [{ role: "user", parts: [{ text: v.TAG_PROMPT }, { inlineData: { mimeType: image.mimeType, data: image.data } }] }],
+    generationConfig: { responseMimeType: "application/json", responseSchema: v.tagSchema },
   };
 }
 
@@ -197,9 +230,9 @@ const retryable = (status) => status === 429 || status >= 500;
  * One generateContent call with one retry on 429/5xx/network error.
  * Returns {ok, status, json|null, error|null, attempts}; never throws.
  */
-export async function callGemini({ fetchImpl, apiKey, model, image, domain = DEFAULT_DOMAIN, backoffMs = 2000, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) }) {
+export async function callGemini({ fetchImpl, apiKey, model, image, domain = DEFAULT_DOMAIN, promptVersion = DEFAULT_PROMPT_VERSION, backoffMs = 2000, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) }) {
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-  const body = JSON.stringify(buildRequestBody(image, domain));
+  const body = JSON.stringify(buildRequestBody(image, domain, promptVersion));
   let last = null;
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
@@ -248,11 +281,23 @@ export function readJsonl(file) {
   return out;
 }
 
-const tagKey = (pinId, domain) => `${domain}\u0000${pinId}`;
+const tagKey = (pinId, domain, promptVersion) => `${domain}\u0000${promptVersion}\u0000${pinId}`;
 
-/** (pin_id, domain) keys that already have a successful (tag != null) record in the output file. */
+/**
+ * (pin_id, domain, prompt_version) keys that already have a successful
+ * (tag != null) record in the output file. A record's prompt_version is the
+ * stored string (e.g. "fashion.tag.v1"); legacy rows without one are keyed as
+ * the domain's default version so the first live run still counts as done.
+ */
 export function taggedKeys(outPath) {
-  return new Set(readJsonl(outPath).filter((r) => r.tag != null && r.domain).map((r) => tagKey(r.pin_id, r.domain)));
+  const keys = new Set();
+  for (const r of readJsonl(outPath)) {
+    if (r.tag == null || !r.domain) continue;
+    const pv = r.prompt_version ?? (DOMAINS[r.domain] ? DOMAINS[r.domain].PROMPT_VERSION : null);
+    if (!pv) continue;
+    keys.add(tagKey(r.pin_id, r.domain, pv));
+  }
+  return keys;
 }
 
 /** @deprecated fashion-era helper: pin_ids with any successful record, regardless of domain. */
@@ -288,7 +333,8 @@ async function runPool(items, n, worker) {
  * @param {number} [opts.limit]           max pins to attempt this run (after skips)
  * @param {string} [opts.model]
  * @param {number} [opts.concurrency]
- * @param {boolean} [opts.onlyMissing]    skip (pin_id, domain) pairs that already have a successful record
+ * @param {boolean} [opts.onlyMissing]    skip (pin_id, domain, prompt_version) triples that already have a successful record
+ * @param {string} [opts.promptVersion]   "v1" (default) or another entry of the domain's VERSIONS (fashion: "v2")
  * @param {boolean} [opts.mock]           force mock mode
  * @param {string|null} [opts.apiKey]     resolved key; null -> mock mode
  * @param {number|null} [opts.priceIn]    USD per million input tokens
@@ -301,8 +347,9 @@ export async function tagPins(opts, deps = {}) {
   const {
     inPath, outPath, domain = null, boardsPath = DEFAULT_BOARDS_PATH, limit = Infinity, model = DEFAULT_MODEL,
     concurrency = 4, onlyMissing = false, priceIn = null, priceOut = null, backoffMs = 2000, log = (m) => console.error(m),
+    promptVersion = DEFAULT_PROMPT_VERSION,
   } = opts;
-  if (domain != null) getDomain(domain); // fail fast on a typo
+  if (domain != null) resolveVersion(domain, promptVersion); // fail fast on a typo or a version the domain lacks
   const fetchImpl = deps.fetchImpl ?? globalThis.fetch;
   const sleep = deps.sleep;
   const apiKey = opts.apiKey === undefined ? resolveApiKey() : opts.apiKey;
@@ -313,7 +360,7 @@ export async function tagPins(opts, deps = {}) {
   const pins = readJsonl(inPath);
   const done = onlyMissing ? taggedKeys(outPath) : new Set();
   const summary = {
-    mode: mock ? "mock" : "live", model: modelLabel, domain, tagged: 0, failed: 0, skipped: 0,
+    mode: mock ? "mock" : "live", model: modelLabel, domain, promptVersion, tagged: 0, failed: 0, skipped: 0,
     skippedBy: {}, byDomain: {}, promptTokens: 0, outputTokens: 0, totalTokens: 0,
     costUsd: priceIn != null && priceOut != null ? 0 : null, records: [],
   };
@@ -331,14 +378,15 @@ export async function tagPins(opts, deps = {}) {
     if (!d) { skip(pin, "unknown_domain", ` (board '${pin.board}' not in ${boardsPath}; pass --domain)`); continue; }
     if (!DOMAINS[d]) { skip(pin, "unknown_domain", ` (pin domain '${d}' not registered)`); continue; }
     if (domain != null && d !== domain) { skip(pin, "other_domain", "", false); continue; }
-    if (done.has(tagKey(pin.pin_id, d))) { skip(pin, "already_tagged"); continue; }
+    const V = resolveVersion(d, promptVersion); // throws when e.g. --prompt-version v2 meets a home pin
+    if (done.has(tagKey(pin.pin_id, d, V.PROMPT_VERSION))) { skip(pin, "already_tagged"); continue; }
     if (todo.length >= limit) break;
     todo.push({ pin, domain: d });
   }
   if (summary.skippedBy.other_domain) log(`skip ${summary.skippedBy.other_domain} pins of other domains (--domain ${domain})`);
   const todoByDomain = {};
   for (const t of todo) todoByDomain[t.domain] = (todoByDomain[t.domain] ?? 0) + 1;
-  log(`${mock ? "mock mode" : `live mode (${model})`}: ${todo.length} pins to tag (${Object.entries(todoByDomain).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}), concurrency ${mock ? 1 : concurrency}`);
+  log(`${mock ? "mock mode" : `live mode (${model})`}: ${todo.length} pins to tag (${Object.entries(todoByDomain).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}), prompt version ${promptVersion}, concurrency ${mock ? 1 : concurrency}`);
 
   fs.mkdirSync(path.dirname(path.resolve(outPath)), { recursive: true });
   const emit = (rec) => {
@@ -348,15 +396,15 @@ export async function tagPins(opts, deps = {}) {
 
   await runPool(todo, mock ? 1 : concurrency, async ({ pin, domain: d }) => {
     const t0 = Date.now();
-    const D = getDomain(d);
+    const V = resolveVersion(d, promptVersion);
     const image = loadImage(pin);
     if (image.skip) { skip(pin, image.skip, image.size ? ` (${(image.size / 1e6).toFixed(1)} MB > 4 MB)` : ""); return; }
 
-    const rec = { pin_id: pin.pin_id, board: pin.board, domain: d, model: modelLabel, prompt_version: D.PROMPT_VERSION, tag: null, error: null, usage: null, cost_usd: null, ms: 0 };
+    const rec = { pin_id: pin.pin_id, board: pin.board, domain: d, model: modelLabel, prompt_version: V.PROMPT_VERSION, tag: null, error: null, usage: null, cost_usd: null, ms: 0 };
     if (mock) {
-      rec.tag = mockTag(pin.pin_id, d);
+      rec.tag = mockTag(pin.pin_id, d, promptVersion);
     } else {
-      const r = await callGemini({ fetchImpl, apiKey, model, image, domain: d, backoffMs, sleep });
+      const r = await callGemini({ fetchImpl, apiKey, model, image, domain: d, promptVersion, backoffMs, sleep });
       if (!r.ok) {
         rec.error = r.error;
       } else {
@@ -369,7 +417,7 @@ export async function tagPins(opts, deps = {}) {
           let parsed;
           try { parsed = JSON.parse(text); } catch (err) { rec.error = `parse: ${String(err)}; text=${text.slice(0, 200)}`; }
           if (parsed !== undefined) {
-            const v = D.validateTag(parsed);
+            const v = V.validateTag(parsed);
             if (v.ok) rec.tag = parsed;
             else rec.error = `validation: ${v.errors.join("; ")}`;
           }
@@ -395,7 +443,7 @@ export async function tagPins(opts, deps = {}) {
 export function formatSummary(s) {
   const perDomain = Object.entries(s.byDomain ?? {}).map(([k, v]) => `${k} ${v.tagged}/${v.tagged + v.failed}`).join(", ");
   const lines = [
-    `--- tag.mjs summary (${s.mode === "live" ? `live, ${s.model}` : "mock"}${s.domain ? `, --domain ${s.domain}` : ""}) ---`,
+    `--- tag.mjs summary (${s.mode === "live" ? `live, ${s.model}` : "mock"}${s.domain ? `, --domain ${s.domain}` : ""}${s.promptVersion && s.promptVersion !== DEFAULT_PROMPT_VERSION ? `, --prompt-version ${s.promptVersion}` : ""}) ---`,
     `tagged ${s.tagged}  failed ${s.failed}  skipped ${s.skipped}${s.skipped ? ` (${Object.entries(s.skippedBy).map(([k, v]) => `${k} ${v}`).join(", ")})` : ""}${perDomain ? `  by domain: ${perDomain}` : ""}`,
     `tokens: prompt ${s.promptTokens}  output ${s.outputTokens}  total ${s.totalTokens}`,
     `cost: ${s.costUsd == null ? "unknown (pass --price-in/--price-out USD per Mtok)" : `$${s.costUsd.toFixed(4)}`}`,
@@ -420,6 +468,7 @@ export function parseCli(argv) {
       mock: { type: "boolean", default: false },
       "price-in": { type: "string" },
       "price-out": { type: "string" },
+      "prompt-version": { type: "string", default: DEFAULT_PROMPT_VERSION },
     },
   });
   const num = (v, name) => {
@@ -431,6 +480,8 @@ export function parseCli(argv) {
   if (values.domain !== undefined && !DOMAINS[values.domain]) {
     throw new Error(`--domain must be one of: ${DOMAIN_NAMES.join(", ")} (got '${values.domain}')`);
   }
+  if (!/^v\d+$/.test(values["prompt-version"])) throw new Error(`--prompt-version must look like v1 or v2 (got '${values["prompt-version"]}')`);
+  if (values.domain !== undefined) resolveVersion(values.domain, values["prompt-version"]); // throws: domain lacks the version
   return {
     domain: values.domain ?? null,
     boardsPath: values.boards,
@@ -443,6 +494,7 @@ export function parseCli(argv) {
     mock: values.mock,
     priceIn: num(values["price-in"], "price-in"),
     priceOut: num(values["price-out"], "price-out"),
+    promptVersion: values["prompt-version"],
   };
 }
 
